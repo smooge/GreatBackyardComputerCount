@@ -78,18 +78,11 @@ System and alter the Data Analysis steps greatly.
 Mirror System
 ~~~~~~~~~~~~~
 
-1. Users in newer versions of CentOS and Fedora will have an
-   additional plugin which will add in a UUID for the system and an
-   ‘variant’ of the system which could be one of the many sub-versions
-   of each release.
-   a. The UUID will allow to track systems which have changing ip
-      addresses due to short lived IPv4 addresses or where there are
-      multiple systems behind a firewall.
-   b. Fedora and CentOS have many variants from the main Workstation
-      and Server to subgroups like Games and Internet of Things. The
-      goal of the variants is to see which variants are being used to
-      install systems so that resources can be better put towards
-      them. 
+1. A repository will be made available which will count as a census
+   tool. This repository will have a script which determines what the
+   OS, variant, uuid of the system is and puts them as variables that
+   can be relayed to a mirror server.
+
 2. The proxy systems will log the two additional data points in
    standard Apache format.
 
