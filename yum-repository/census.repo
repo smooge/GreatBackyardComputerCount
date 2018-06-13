@@ -1,5 +1,5 @@
 [census]
 name=A Test URL for Census
-mirrorlist=http://linode.smoogespace.com/census?release=$census_os-$census_variant-$releasever&arch=$basearch&uuid=$census_uuid
+mirrorlist=http://linode.smoogespace.com/census?os=$census_os&variant=$census_variant&release=$releasever&arch=$basearch&uuid=$census_uuid
 enabled=0
 skip_if_unavailable=true
