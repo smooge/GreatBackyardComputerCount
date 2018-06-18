@@ -17,9 +17,9 @@ from flask import Flask,request,abort
 import config
 
 ## These are global readers for the application
-reader_country = geoip2.database.Reader(GEO_DB_COUNTRY_LOC)
-reader_domain  = geoip2.database.Reader(GEO_DB_DOMAIN_LOC)
-reader_isp     = geoip2.database.Reader(GEO_DB_ISP_LOC)
+reader_country = geoip2.database.Reader(config.GEO_DB_COUNTRY_LOC)
+reader_domain  = geoip2.database.Reader(config.GEO_DB_DOMAIN_LOC)
+reader_isp     = geoip2.database.Reader(config.GEO_DB_ISP_LOC)
 
 app = Flask(__name__)
 
@@ -40,10 +40,10 @@ def census():
         my_country = "UNKNOWN"
     app.logger.info("IP: %s, Country: %s, OS: %s, Variant: %s, Version: %s, Arch: %s, UUID: %s" % (my_ip,my_country,my_os,my_os_variant,my_os_version,my_os_arch,my_uuid))
 
-    return MIRROR_LIST
+    return config.MIRROR_LIST
 
 if __name__ == "__main__":
-    logHandler = logging.FileHandler(filename='GBCC.log')
+    logHandler = logging.FileHandler(filename=config.LOGFILE)
     formatter = logging.Formatter('%(asctime)s %(message)s')
     logHandler.setFormatter(formatter)
     logHandler.setLevel(logging.INFO)

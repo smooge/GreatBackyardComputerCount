@@ -24,4 +24,4 @@ http://www.smoogespace.com/downloads/census/
 
 ##
 ## The logfile 
-LOGFILE='/home/smooge/census-server/GBCC_server.log'
+LOGFILE= basedir+ '/GBCC_server.log'
