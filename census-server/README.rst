@@ -21,20 +21,4 @@ The server returns a minimal repomd.xml that acts as a metalink for a
 Software Required
 =================
 
-python 2.7 or python 3.4+
-
-certifi==2018.4.16
-chardet==3.0.4
-click==6.7
-Flask==1.0.2
-geoip2==2.9.0
-idna==2.6
-ipaddress==1.0.22
-itsdangerous==0.24
-Jinja2==2.10
-MarkupSafe==1.0
-maxminddb==1.4.0
-requests==2.18.4
-six==1.11.0
-urllib3==1.22
-Werkzeug==0.14.1
+See requirements.txt for the versions this was built and tested with.

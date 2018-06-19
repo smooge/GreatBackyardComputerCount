@@ -2,10 +2,10 @@
 
 PATH=/usr/bin:/bin
 OS_DATA=/etc/os-release
-#YUM_VARS=/etc/yum/vars
-#DNF_TREE=/etc/dnf
-YUM_VARS=/home/smooge/test/yum/vars
-DNF_TREE=/home/smooge/test/dnf
+YUM_VARS=/etc/yum/vars
+DNF_TREE=/etc/dnf
+#YUM_VARS=/home/smooge/test/yum/vars
+#DNF_TREE=/home/smooge/test/dnf
 PROC_UUID=/proc/sys/kernel/random/uuid
 YUM_UUID=/var/lib/yum/uuid
 
