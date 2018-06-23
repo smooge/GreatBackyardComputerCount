@@ -9,13 +9,25 @@ This module is responsible for loading the application configuration.
 import os
 #basedir = os.path.abspath(os.path.dirname(__file__))
 
+# Hey look ma.. I keep my files in my home directory.. geez
 basedir = '/home/smooge'
 ##
 ## These are global variables for hte GEOIP and need to be changed per site. 
 
 GEO_DB_COUNTRY_LOC = basedir + '/GeoIP2/GeoIP2-Country.mmdb'
-GEO_DB_DOMAIN_LOC  = basedir + '/GeoIP2/GeoIP2-Domain.mmdb'
-GEO_DB_ISP_LOC     = basedir + '/GeoIP2/GeoIP2-ISP.mmdb'
+
+CSV_FILE = basedir + '/GBCC.csv'
+CSV_FIELD = [
+    "Date", 
+    "IP",
+    "UUID",
+    "OS",
+    "Variant",
+    "Release",
+    "Arch",
+    "ClientApp"
+]
+
 
 ##
 ## Our one mirror.
@@ -26,7 +38,6 @@ http://www.smoogespace.com/downloads/census/
 ##
 ## The logfile 
 LOGFILE= basedir+ '/GBCC_server.log'
-DEBUGFILE= basedir+ '/GBCC_debug.log'
 
 KNOWN_VARIANTS={
     'workstation':'workstation',
@@ -35,13 +46,19 @@ KNOWN_VARIANTS={
     'silverblue': 'silverblue',
 }
 KNOWN_OSES={
-    'fedora':'fedora',
-    'centos':'centos',
+    'fedora': 'fedora',
+    'centos': 'centos',
     'rhel':'rhel',
-    'el':'rhel',
+    'scilin': 'scilin',
+    'el':'el',
     'coreos':'coreos',
-    'scilin':'scilin'
 }
+
+FEDORA_RELEASES= [3,40]
+EL_RELEAES= [5,8]
+CORE_RELEASES= [0,40]
+
+
 # Arches taken from what systems have replied in logs
 KNOWN_ARCHES = {
     'aarch64' : 'aarch64',
@@ -80,6 +97,7 @@ KNOWN_CLIENTS = {
     'curl' : 'curl',
     'dnf' : 'dnf',
     'packagekit' : 'packagekit',
+    'preupgrade' : 'anaconda',
     'python-requests' : 'anaconda',
     'ostree' : 'ostree',
     'atomic' : 'ostree',
@@ -87,8 +105,6 @@ KNOWN_CLIENTS = {
     'wget' : 'wget',
     'yum' : 'yum',
 }
-
-
 
 DEF_COUNTRY = 'unknown'
 DEF_IP = '255.255.255.255'
@@ -98,3 +114,4 @@ DEF_VARIANT = 'unknown'
 DEF_RELEASE = 0
 DEF_CLIENT = 'unknown'
 DEF_UUID = 'unknown'
+

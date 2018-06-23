@@ -8,19 +8,37 @@ mirrors that can be used to get the current repodata for the server.
 
 """
 
-import logging
-import geoip2.database
-import geoip2.errors
+import errno, sys
+import csv               # this is a temp to write out logs. replace with alchemy
+import time              # get your time, get your red hot time
+import geoip2.database   # can't know your places 
+import geoip2.errors     # without geoip2
+import logging           # and to log our errors
 
 from flask import Flask,request,abort
 from uuid import UUID
 
+# local config
 import config
 
+
+
 ## These are global readers for the application
-reader_country = geoip2.database.Reader(config.GEO_DB_COUNTRY_LOC)
-reader_domain  = geoip2.database.Reader(config.GEO_DB_DOMAIN_LOC)
-reader_isp     = geoip2.database.Reader(config.GEO_DB_ISP_LOC)
+try:
+    reader_country = geoip2.database.Reader(config.GEO_DB_COUNTRY_LOC)
+except:
+    sys.exit(errno.EACCES)
+
+
+def init_csv():
+    with open(config.CSV_FILE, 'a') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=config.CSV_FIELD)
+        writer.writeheader()
+
+def write_csv(data):
+    with open(config.CSV_FILE, 'a') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=config.CSV_FIELD)
+        writer.writerow(data)
 
 
 def clean_request(temp_answer):
@@ -206,11 +224,25 @@ def census():
         my_country = reader_country.country(request.remote_addr)
     except:
         my_country = config.DEF_COUNTRY
-    app.logger.info("IP: %s, Country: %s, OS: %s, Variant: %s, Release: %s, Arch: %s, UUID: %s, Client: %s" % (my_ip,my_country,my_os,my_variant,my_release,my_arch,my_uuid,my_client))
 
+    my_data = { 
+        config.CSV_FIELD[0] : time.strftime('%Y-%m-%d',),
+        config.CSV_FIELD[1] : my_ip,
+        config.CSV_FIELD[2] : my_uuid,
+        config.CSV_FIELD[3] : my_os,
+        config.CSV_FIELD[4] : my_variant,
+        config.CSV_FIELD[5] : my_release,
+        config.CSV_FIELD[6] : my_arch,
+        config.CSV_FIELD[7] : my_client
+    }
+    write_csv(my_data)
+
+    # and end this by returning our mirror
+    # TODO: make this a metalink using a template
     return config.MIRROR_LIST
 
 if __name__ == "__main__":
+    init_csv()
     logHandler = logging.FileHandler(filename=config.LOGFILE)
     formatter = logging.Formatter('%(asctime)s %(message)s')
     logHandler.setFormatter(formatter)
