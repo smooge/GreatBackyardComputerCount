@@ -29,12 +29,13 @@ This module is responsible for loading the application configuration.
 # TODO have setup do this.
 basedir = '/home/smooge'
 
-##
-## These are global variables for hte GEOIP and need to be changed per site. 
-
 GEO_DB_COUNTRY_LOC = basedir + '/GeoIP2/GeoIP2-Country.mmdb'
 
-CSV_FILE = basedir + '/GBCC.csv'
+# We do not define the CSV_FILE here as it should be an argument of
+# the calling analysis program.
+#
+#CSV_FILE = basedir + '/GBCC.csv'
+
 CSV_FIELD = [
     "Date", 
     "IP",
@@ -45,17 +46,6 @@ CSV_FIELD = [
     "Arch",
     "ClientApp"
 ]
-
-
-##
-## Our one mirror.
-MIRROR_LIST="""
-http://www.smoogespace.com/downloads/census/
-"""
-
-##
-## The logfile 
-LOGFILE= basedir+ '/GBCC_server.log'
 
 KNOWN_VARIANTS={
     'workstation':'workstation',
