@@ -6,7 +6,10 @@ Great Backyard Computer Count
     :align: center
     :alt: Bearguins on a beach. 
 
-Art created by Sarah Richter <info@sarah-richter-illustration.de>. Licensed under Creative Commons 3 Share-Alike.
+Art edited by Sarah Richter <info@sarah-richter-illustration.de> and
+uses the same license of
+https://creativecommons.org/share-your-work/public-domain/cc0/ as the
+original work on wikimedia.org.
 
 
 The Great Backyard Computer Count is a project to improve the ways
