@@ -1,6 +1,13 @@
 =============================
 Great Backyard Computer Count
 =============================
+.. image:: ./images/Bearguins.jpg
+    :scale: 50%
+    :align: center
+    :alt: Bearguins on a beach. 
+
+Art created by Sarah Richter <info@sarah-richter-illustration.de>. Licensed under Creative Commons 3 Share-Alike.
+
 
 The Great Backyard Computer Count is a project to improve the ways
 that the Fedora Project counts its users.
