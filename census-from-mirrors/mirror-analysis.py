@@ -39,7 +39,7 @@ from uuid import UUID
 import config
 
 pattern = re.compile("".join(config.REPO_LOGFMT))
-repo_keys = config.REPOS_KEYS
+repo_keys = config.REPO_KEYS
 
 
 ## These are global readers for the application
@@ -164,19 +164,16 @@ def parse_request(request):
     arch=config.DEF_ARCH
     uuid=config.DEF_UUID
     variant=config.DEF_VARIANT
-    try:
-        parts = request.split()[1].split("?")[1].split("&")
-        for i in parts:
-            if 'repo=' in i:
-                repo = i.split('=')[1]
-            if 'arch=' in i:
-                arch = i.split('=')[1]
-            if 'uuid=' in i:
-                uuid = i.split('=')[1]
-            if 'variant=' in i:
-                variant = i.split('=')[1]
-    except:
-        # do nothing. we just don't want a traceback on bad split
+    parts = request.split()[1].split("?")[1].split("&")
+    for i in parts:
+        if 'repo=' in i:
+            repo = i.split('=')[1]
+        if 'arch=' in i:
+            arch = i.split('=')[1]
+        if 'uuid=' in i:
+            uuid = i.split('=')[1]
+        if 'variant=' in i:
+            variant = i.split('=')[1]
     return (repo,arch,uuid,variant)
 
 #
@@ -192,6 +189,8 @@ def parse_line(our_line):
         our_blob = pattern.match(our_line)
         if our_blob:
             our_dict = our_blob.groupdict()
+            if our_dict['status'] != 200:
+                return None
             ip       = our_dict['host']
             ## Figure out where in the world we think we are.
             try:
@@ -200,6 +199,7 @@ def parse_line(our_line):
                 country = config.DEF_COUNTRY
             my_time     = determine_rfc3339_date(our_dict['time']) 
             r,a,u,v  = parse_request(our_dict['request'])
+                
             my_os,my_release  = determine_repo(r)
             my_arch     = determine_arch(a)
             my_uuid     = determine_uuid(u)
@@ -243,7 +243,7 @@ def parselog(our_file, out_file):
         sys.stderr.write("Unable to open %s\n" % out_file )
         sys.exit(-1)
 
-    for line in data:
+    for line in in_data:
         parsed = parse_line(line)
         if parsed is None:
             pass

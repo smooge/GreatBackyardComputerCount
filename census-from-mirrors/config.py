@@ -197,32 +197,32 @@ FEDORA_REPOS = {
     "f31" : ("fedora",31),
     "f32" : ("fedora",32),
     "f33" : ("fedora",33),
-    'fmodular27' : ("fed_mod",27)
-    'fmodular28' : ("fed_mod",28)
-    'fmodular29' : ("fed_mod",29)
-    'fmodular30' : ("fed_mod",30)
-    'fmodular31' : ("fed_mod",31)
-    'fmodular32' : ("fed_mod",32)
-    'fmodular33' : ("fed_mod",33)
-    'modularf27' : ("fed_mod",34)
-    'modularf28' : ("fed_mod",35)
-    'modularf29' : ("fed_mod",36)
-    'modularf30' : ("fed_mod",37)
-    'modularf31' : ("fed_mod",38)
-    'modularf32' : ("fed_mod",39)
-    'modularf33' : ("fed_mod",40)
-    'rhel4'     : ("rhel",4)
-    'rhel5'     : ("rhel",5)
-    'rhel6'     : ("rhel",6)
-    'rhel7'     : ("rhel",7)
-    'rhel8'     : ("rhel",8)
-    'rhel9'     : ("rhel",9)
-    'centos4'     : ("centos",4)
-    'centos5'     : ("centos",5)
-    'centos6'     : ("centos",6)
-    'centos7'     : ("centos",7)
-    'centos8'     : ("centos",8)
-    'centos9'     : ("centos",9)
+    'fmodular27' : ("fed_mod",27),
+    'fmodular28' : ("fed_mod",28),
+    'fmodular29' : ("fed_mod",29),
+    'fmodular30' : ("fed_mod",30),
+    'fmodular31' : ("fed_mod",31),
+    'fmodular32' : ("fed_mod",32),
+    'fmodular33' : ("fed_mod",33),
+    'modularf27' : ("fed_mod",34),
+    'modularf28' : ("fed_mod",35),
+    'modularf29' : ("fed_mod",36),
+    'modularf30' : ("fed_mod",37),
+    'modularf31' : ("fed_mod",38),
+    'modularf32' : ("fed_mod",39),
+    'modularf33' : ("fed_mod",40),
+    'rhel4'     : ("rhel",4),
+    'rhel5'     : ("rhel",5),
+    'rhel6'     : ("rhel",6),
+    'rhel7'     : ("rhel",7),
+    'rhel8'     : ("rhel",8),
+    'rhel9'     : ("rhel",9),
+    'centos4'     : ("centos",4),
+    'centos5'     : ("centos",5),
+    'centos6'     : ("centos",6),
+    'centos7'     : ("centos",7),
+    'centos8'     : ("centos",8),
+    'centos9'     : ("centos",9),
 }
 
 APACHE_MONTHS ={
@@ -267,7 +267,7 @@ FED_REPO_CODE = "f"
 FED_REPO_SPEW = [ 'client', 'cloud', 'server', 'workstation', '-' ]
 
 ## We may have different rules here for centos
-if config.MIRRORS == 'fedora':
+if MIRRORS == 'fedora':
     REPO_PREWORDS = FED_REPO_PREWORDS
     REPO_SUBWORDS = FED_REPO_SUBWORDS
     REPO_CODE = FED_REPO_CODE
