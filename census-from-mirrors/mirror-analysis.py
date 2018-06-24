@@ -64,21 +64,27 @@ def clean_request(temp_answer):
 #
 # A routine which takes the date from apache format to standard RFC3339
 # Please see https://tools.ietf.org/html/rfc3339
-def determine_rfc3339_date(a_date):
-    date_subpart = a_date.split()
+def determine_rfc3339_date(givendate):
+    date_subpart = givendate.split()
     
     # We may have been given garbage.. logs are the devil's playground
     try:
-        [day, month, year] = date_subpart.split(":")[0].split('/')
+        [day, month, year] = date_subpart[0].split(":")[0].split('/')
     except:
         # string out of index because date corrupted?
-        [day, month, year ] = ['01', '01', '1970'] # epoch
+        [day, month, year ] = config.DEF_DATE # epoch
+    
     ret_str = "%s-%s-%s" % (year, config.APACHE_MONTHS[month], day)
+
     return ret_str
 
 def determine_repo(asked_repo):
+    if asked_repo is None:
+        return (config.DEF_OS,config.DEF_RELEASE)
+
     # start the process of cleaning out various weirdness clients have
     spew = clean_request(asked_repo)
+
     # Clean off prewords with repodata
     for word in config.REPO_PREWORDS:
         if word in spew:
@@ -89,14 +95,12 @@ def determine_repo(asked_repo):
         if word in spew:
             spew = spew.replace(word, "")
 
-    # And even other stuff we see
-    for word in config.REPO_SPEW:
-        if word in spew:
-            tempstr = spew + ".*"
-            spew = re.sub(tempstr, "", spew)
+    if "-" in spew:
+        spew = re.sub("-+", "", spew)
 
     # OK clean out any other garbage and remove end of line
     sanitize = spew.strip()
+
 
     if sanitize in config.REPO_KEYS:
         return config.REPO_NAMES[sanitize]
@@ -107,7 +111,6 @@ def determine_repo(asked_repo):
 def determine_arch(asked_arch):
 
     sanitize = clean_request(asked_arch)
-
     if sanitize in config.KNOWN_ARCHES:
         return config.KNOWN_ARCHES[sanitize]
     else:
@@ -186,20 +189,29 @@ def parse_line(our_line):
     global pattern
 
     if (('/metalink' in our_line) or ('/mirrorlist' in our_line)):
+        my_ip      = config.DEF_IP
+        my_country = config.DEF_COUNTRY
+        my_uuid    = config.DEF_UUID
+        my_os      = config.DEF_OS
+        my_variant = config.DEF_VARIANT
+        my_release = config.DEF_RELEASE
+        my_arch    = config.DEF_ARCH
+        my_client  = config.DEF_CLIENT
         our_blob = pattern.match(our_line)
         if our_blob:
             our_dict = our_blob.groupdict()
-            if our_dict['status'] != 200:
+            if our_dict['status'] != "200":
                 return None
-            ip       = our_dict['host']
+            my_ip       = our_dict['host']
             ## Figure out where in the world we think we are.
             try:
-                country = reader_country.country(ip)
+                response   = reader_country.country(my_ip)
+                my_country = response.country.iso_code
             except:
-                country = config.DEF_COUNTRY
+                my_country = config.DEF_COUNTRY
+
             my_time     = determine_rfc3339_date(our_dict['time']) 
             r,a,u,v  = parse_request(our_dict['request'])
-                
             my_os,my_release  = determine_repo(r)
             my_arch     = determine_arch(a)
             my_uuid     = determine_uuid(u)
@@ -209,14 +221,15 @@ def parse_line(our_line):
             my_data = {
                 config.CSV_FIELD[0] : my_time,
                 config.CSV_FIELD[1] : my_ip,
-                config.CSV_FIELD[1] : my_country,
-                config.CSV_FIELD[2] : my_uuid,
-                config.CSV_FIELD[3] : my_os,
-                config.CSV_FIELD[4] : my_variant,
-                config.CSV_FIELD[5] : my_release,
-                config.CSV_FIELD[6] : my_arch,
-                config.CSV_FIELD[7] : my_client
+                config.CSV_FIELD[2] : my_country,
+                config.CSV_FIELD[3] : my_uuid,
+                config.CSV_FIELD[4] : my_os,
+                config.CSV_FIELD[5] : my_variant,
+                config.CSV_FIELD[6] : my_release,
+                config.CSV_FIELD[7] : my_arch,
+                config.CSV_FIELD[8] : my_client
             }
+            return my_data
         else:
             return None
     else:

@@ -218,7 +218,8 @@ def census():
 
     ## Figure out where in the world we think we are.
     try:
-        my_country = reader_country.country(request.remote_addr)
+        response = reader_country.country(request.remote_addr)
+        my_country = response.country.iso_code
     except:
         my_country = config.DEF_COUNTRY
 

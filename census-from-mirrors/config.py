@@ -47,6 +47,7 @@ CSV_FILE = basedir + '/mirrors-analized.csv'
 CSV_FIELD = [
     "Date", 
     "IP",
+    "Country",
     "UUID",
     "OS",
     "Variant",
@@ -125,15 +126,16 @@ KNOWN_CLIENTS = {
     'yum' : 'yum',
 }
 
-DEF_COUNTRY = 'unknown'
 DEF_IP = '255.255.255.255'
+DEF_COUNTRY = 'unknown'
+DEF_UUID = 'ffffffff-ffff-ffff-ffff-ffffffffffff'
 DEF_OS = 'unknown'
-DEF_ARCH = 'unknown'
 DEF_VARIANT = 'unknown'
 DEF_REPO = 'unknown'
 DEF_RELEASE = 0
+DEF_ARCH = 'unknown'
 DEF_CLIENT = 'unknown'
-DEF_UUID = 'unknown'
+DEF_DATE = ['02', 'Jan', '1970'] # day after epoch
 
 ## Standard Fedora Apache Log Format
 FEDORA_LOGFORMAT =  [
@@ -197,13 +199,13 @@ FEDORA_REPOS = {
     "f31" : ("fedora",31),
     "f32" : ("fedora",32),
     "f33" : ("fedora",33),
-    'fmodular27' : ("fed_mod",27),
-    'fmodular28' : ("fed_mod",28),
-    'fmodular29' : ("fed_mod",29),
-    'fmodular30' : ("fed_mod",30),
-    'fmodular31' : ("fed_mod",31),
-    'fmodular32' : ("fed_mod",32),
-    'fmodular33' : ("fed_mod",33),
+    'modular27' : ("fed_mod",27),
+    'modular28' : ("fed_mod",28),
+    'modular29' : ("fed_mod",29),
+    'modular30' : ("fed_mod",30),
+    'modular31' : ("fed_mod",31),
+    'modular32' : ("fed_mod",32),
+    'modular33' : ("fed_mod",33),
     'modularf27' : ("fed_mod",34),
     'modularf28' : ("fed_mod",35),
     'modularf29' : ("fed_mod",36),
@@ -242,7 +244,7 @@ APACHE_MONTHS ={
 
 # Log files get a lot of weird things stuck in them.. if we see these
 # ignore them..
-CRAP_CHARS = ['/', '$', '!', '#', '%', '&', "'", '"', "(", ")", "*", "+", ",", "_", ":", ";", "<", ">", "=", "?", "@", "[", "^", "|"]
+CRAP_CHARS = ['/', '$', '!', '#', '%', '&', "'", '"', "(", ")", "*", "+", ",", ":", ";", "<", ">", "=", "?", "@", "[", "^", "|"]
 
 FED_REPO_PREWORDS = ["core", 
                      "fedora", 
@@ -261,17 +263,20 @@ FED_REPO_SUBWORDS = [ ".newkey",
                       "released", 
                       "source", 
                       "testing", 
-                      "updates"] 
-FED_REPO_CODE = "f"
+                      "updates",
+                      "client",
+                      "cloud",
+                      "server",
+                      "workstation",
+                      ]
 
-FED_REPO_SPEW = [ 'client', 'cloud', 'server', 'workstation', '-' ]
+FED_REPO_CODE = "f"
 
 ## We may have different rules here for centos
 if MIRRORS == 'fedora':
     REPO_PREWORDS = FED_REPO_PREWORDS
     REPO_SUBWORDS = FED_REPO_SUBWORDS
     REPO_CODE = FED_REPO_CODE
-    REPO_SPEW = FED_REPO_SPEW
     REPO_NAMES = FEDORA_REPOS 
     REPO_LOGFMT = FEDORA_LOGFORMAT
     REPO_KEYS = FEDORA_REPOS.keys()
