@@ -62,32 +62,11 @@ def write_csv(data):
 def clean_request(temp_answer):
     # We sometimes get additional data added onto the yum/dnf requests.
     spew = temp_answer.split("/")[0]
-    spew = spew.split("!")[0]
-    spew = spew.split("#")[0]
-    spew = spew.split("%")[0]
-    spew = spew.split("&")[0]
-    spew = spew.split("'")[0]
-    spew = spew.split("(")[0]
-    spew = spew.split("*")[0]
-    spew = spew.split("+")[0]
-    spew = spew.split(",")[0]
-    spew = spew.split("-")[0]
-    spew = spew.split(".")[0]
-    spew = spew.split(":")[0]
-    spew = spew.split(";")[0]
-    spew = spew.split("<")[0]
-    spew = spew.split("=")[0]
-    spew = spew.split(">")[0]
-    spew = spew.split("?")[0]
-    spew = spew.split("@")[0]
-    spew = spew.split("[")[0]
-    spew = spew.split("]")[0]
-    spew = spew.split("^")[0]
-    spew = spew.split('"')[0]
-    spew = spew.split('\\')[0]
-    spew = spew.split('|')[0]
-    spew = spew.split('$')[0]
-    return spew
+    for char in config.CRAP_CHARS:
+        if char in spew:
+            spew = spew.split(char)[0]
+    sanitize = spew.lower()
+    return sanitize
 
 
 # This routine will sanitize the asked for arch to try and clean out
@@ -246,12 +225,13 @@ def census():
     my_data = { 
         config.CSV_FIELD[0] : time.strftime('%Y-%m-%d',),
         config.CSV_FIELD[1] : my_ip,
-        config.CSV_FIELD[2] : my_uuid,
-        config.CSV_FIELD[3] : my_os,
-        config.CSV_FIELD[4] : my_variant,
-        config.CSV_FIELD[5] : my_release,
-        config.CSV_FIELD[6] : my_arch,
-        config.CSV_FIELD[7] : my_client
+        config.CSV_FIELD[2] : my_country,
+        config.CSV_FIELD[3] : my_uuid,
+        config.CSV_FIELD[4] : my_os,
+        config.CSV_FIELD[5] : my_variant,
+        config.CSV_FIELD[6] : my_release,
+        config.CSV_FIELD[7] : my_arch,
+        config.CSV_FIELD[8] : my_client
     }
     write_csv(my_data)
 

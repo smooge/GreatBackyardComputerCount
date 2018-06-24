@@ -38,6 +38,7 @@ CSV_FILE = basedir + '/GBCC.csv'
 CSV_FIELD = [
     "Date", 
     "IP",
+    "Country",
     "UUID",
     "OS",
     "Variant",
@@ -45,6 +46,10 @@ CSV_FIELD = [
     "Arch",
     "ClientApp"
 ]
+
+# Log files get a lot of weird things stuck in them.. if we see these
+# ignore them..
+CRAP_CHARS = ['/', '$', '!', '#', '%', '&', "'", '"', "(", ")", "*", "+", ",", "_", ":", ";", "<", ">", "=", "?", "@", "[", "^", "|"]
 
 
 ##

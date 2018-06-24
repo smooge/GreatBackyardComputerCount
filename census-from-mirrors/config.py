@@ -29,12 +29,20 @@ This module is responsible for loading the application configuration.
 # TODO have setup do this.
 basedir = '/home/smooge'
 
+
+#
+# This needs to point to where the geoip2 data is
 GEO_DB_COUNTRY_LOC = basedir + '/GeoIP2/GeoIP2-Country.mmdb'
+
+#
+# This needs to be set to which logs we are looking at
+MIRRORS='fedora'
+#MIRRORS='centos'
 
 # We do not define the CSV_FILE here as it should be an argument of
 # the calling analysis program.
 #
-#CSV_FILE = basedir + '/GBCC.csv'
+CSV_FILE = basedir + '/mirrors-analized.csv'
 
 CSV_FIELD = [
     "Date", 
@@ -53,8 +61,10 @@ KNOWN_VARIANTS={
     'desktop': 'desktop',
     'silverblue': 'silverblue',
 }
+
 KNOWN_OSES={
     'fedora': 'fedora',
+    'fed_mod': 'fed_mod',
     'centos': 'centos',
     'rhel':'rhel',
     'scilin': 'scilin',
@@ -65,6 +75,7 @@ KNOWN_OSES={
 FEDORA_RELEASES= [3,40]
 EL_RELEAES= [5,8]
 CORE_RELEASES= [0,40]
+
 
 
 # Arches taken from what systems have replied in logs
@@ -119,7 +130,148 @@ DEF_IP = '255.255.255.255'
 DEF_OS = 'unknown'
 DEF_ARCH = 'unknown'
 DEF_VARIANT = 'unknown'
+DEF_REPO = 'unknown'
 DEF_RELEASE = 0
 DEF_CLIENT = 'unknown'
 DEF_UUID = 'unknown'
 
+## Standard Fedora Apache Log Format
+FEDORA_LOGFORMAT =  [
+    r"(?P<host>([\d\.]+|[0-9a-fA-F\:]+))\s",
+    r"(?P<identity>\S*)\s",
+    r"(?P<user>\S*)\s",
+    r"\[(?P<time>.*?)\]\s",
+    r'"(?P<request>.*?)"\s',
+    r"(?P<status>\d+)\s",
+    r"(?P<bytes>\S*)\s",
+    r'"(?P<referrer>.*?)"\s',
+    r'"(?P<user_agent>.*?)"\s*',
+]
+
+# The repository that is returned by clients can be weird so we have to
+# have multiple variants.
+FEDORA_REPOS = {
+    "epel4" : ("el",4),
+    "epel5" : ("el",5),
+    "epel6" : ("el",6), 
+    "epel7" : ("el",7),
+    "epel8" : ("el",8),
+    "rawhide" : ("fedora",-1),
+    "frawhide" : ("fedora",-1),
+    "rawhidemodular" :  ("fed_mod",-1),
+    "f03" : ("fedora",3),
+    "f04" : ("fedora",4),
+    "f05" : ("fedora",5),
+    "f06" : ("fedora",6),
+    "f07" : ("fedora",7),
+    "f08" : ("fedora",8),
+    "f09" : ("fedora",9),
+    "f3" : ("fedora",3),
+    "f4" : ("fedora",4),
+    "f5" : ("fedora",5),
+    "f6" : ("fedora",6),
+    "f7" : ("fedora",7),
+    "f8" : ("fedora",8),
+    "f9" : ("fedora",9),
+    "f10" : ("fedora",10),
+    "f11" : ("fedora",11),
+    "f12" : ("fedora",12),
+    "f13" : ("fedora",13),
+    "f14" : ("fedora",14),
+    "f15" : ("fedora",15),
+    "f16" : ("fedora",16),
+    "f17" : ("fedora",17),
+    "f18" : ("fedora",18),
+    "f19" : ("fedora",19),
+    "f20" : ("fedora",20),
+    "f21" : ("fedora",21),
+    "f22" : ("fedora",22),
+    "f23" : ("fedora",23),
+    "f24" : ("fedora",24),
+    "f25" : ("fedora",25),
+    "f26" : ("fedora",26),
+    "f27" : ("fedora",27),
+    "f28" : ("fedora",28),
+    "f29" : ("fedora",29),
+    "f30" : ("fedora",30),
+    "f31" : ("fedora",31),
+    "f32" : ("fedora",32),
+    "f33" : ("fedora",33),
+    'fmodular27' : ("fed_mod",27)
+    'fmodular28' : ("fed_mod",28)
+    'fmodular29' : ("fed_mod",29)
+    'fmodular30' : ("fed_mod",30)
+    'fmodular31' : ("fed_mod",31)
+    'fmodular32' : ("fed_mod",32)
+    'fmodular33' : ("fed_mod",33)
+    'modularf27' : ("fed_mod",34)
+    'modularf28' : ("fed_mod",35)
+    'modularf29' : ("fed_mod",36)
+    'modularf30' : ("fed_mod",37)
+    'modularf31' : ("fed_mod",38)
+    'modularf32' : ("fed_mod",39)
+    'modularf33' : ("fed_mod",40)
+    'rhel4'     : ("rhel",4)
+    'rhel5'     : ("rhel",5)
+    'rhel6'     : ("rhel",6)
+    'rhel7'     : ("rhel",7)
+    'rhel8'     : ("rhel",8)
+    'rhel9'     : ("rhel",9)
+    'centos4'     : ("centos",4)
+    'centos5'     : ("centos",5)
+    'centos6'     : ("centos",6)
+    'centos7'     : ("centos",7)
+    'centos8'     : ("centos",8)
+    'centos9'     : ("centos",9)
+}
+
+APACHE_MONTHS ={
+    'Jan' : '01',
+    'Feb' : '02',
+    'Mar' : '03',
+    'Apr' : '04',
+    'May' : '05',
+    'Jun' : '06',
+    'Jul' : '07',
+    'Aug' : '08',
+    'Sep' : '09',
+    'Oct' : '10',
+    'Nov' : '11',
+    'Dec' : '12', 
+}
+
+# Log files get a lot of weird things stuck in them.. if we see these
+# ignore them..
+CRAP_CHARS = ['/', '$', '!', '#', '%', '&', "'", '"', "(", ")", "*", "+", ",", "_", ":", ";", "<", ">", "=", "?", "@", "[", "^", "|"]
+
+FED_REPO_PREWORDS = ["core", 
+                     "fedora", 
+                     "extras", 
+                     "legacy", 
+                     "fc"]
+FED_REPO_SUBWORDS = [ ".newkey", 
+                      "install", 
+                      "alpha", 
+                      "beta", 
+                      "debug", 
+                      "devel", 
+                      "info", 
+                      "optional", 
+                      "preview", 
+                      "released", 
+                      "source", 
+                      "testing", 
+                      "updates"] 
+FED_REPO_CODE = "f"
+
+FED_REPO_SPEW = [ 'client', 'cloud', 'server', 'workstation', '-' ]
+
+## We may have different rules here for centos
+if config.MIRRORS == 'fedora':
+    REPO_PREWORDS = FED_REPO_PREWORDS
+    REPO_SUBWORDS = FED_REPO_SUBWORDS
+    REPO_CODE = FED_REPO_CODE
+    REPO_SPEW = FED_REPO_SPEW
+    REPO_NAMES = FEDORA_REPOS 
+    REPO_LOGFMT = FEDORA_LOGFORMAT
+    REPO_KEYS = FEDORA_REPOS.keys()
