@@ -35,12 +35,10 @@ import time              # get your time, get your red hot time
 
 from uuid import UUID
 
-
 import config
 
 pattern = re.compile("".join(config.REPO_LOGFMT))
 repo_keys = config.REPO_KEYS
-
 
 ## These are global readers for the application
 try:
@@ -109,7 +107,6 @@ def determine_repo(asked_repo):
 
 # This is similar to the repos but has a lot less garbage normally
 def determine_arch(asked_arch):
-
     sanitize = clean_request(asked_arch)
     if sanitize in config.KNOWN_ARCHES:
         return config.KNOWN_ARCHES[sanitize]
@@ -158,7 +155,6 @@ def determine_client(asked_client):
             return value
     return config.DEF_CLIENT
 
-
 #
 # A subroutine to try to determine our get data (field 7 of normal apache log)
 #
@@ -197,6 +193,8 @@ def parse_line(our_line):
         my_release = config.DEF_RELEASE
         my_arch    = config.DEF_ARCH
         my_client  = config.DEF_CLIENT
+        if ('repo=' not in our_line) :
+            return None
         our_blob = pattern.match(our_line)
         if our_blob:
             our_dict = our_blob.groupdict()
@@ -209,7 +207,7 @@ def parse_line(our_line):
                 my_country = response.country.iso_code
             except:
                 my_country = config.DEF_COUNTRY
-
+                        
             my_time     = determine_rfc3339_date(our_dict['time']) 
             r,a,u,v  = parse_request(our_dict['request'])
             my_os,my_release  = determine_repo(r)
@@ -217,7 +215,7 @@ def parse_line(our_line):
             my_uuid     = determine_uuid(u)
             my_variant  = determine_variant(v)
             my_client   = determine_client(our_dict['user_agent'])
-
+            
             my_data = {
                 config.CSV_FIELD[0] : my_time,
                 config.CSV_FIELD[1] : my_ip,
@@ -229,12 +227,12 @@ def parse_line(our_line):
                 config.CSV_FIELD[7] : my_arch,
                 config.CSV_FIELD[8] : my_client
             }
+
             return my_data
         else:
             return None
     else:
         return None
-
 
 ##
 ## The main worker subroutine

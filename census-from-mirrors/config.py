@@ -128,7 +128,7 @@ KNOWN_CLIENTS = {
 
 DEF_IP = '255.255.255.255'
 DEF_COUNTRY = 'unknown'
-DEF_UUID = 'ffffffff-ffff-ffff-ffff-ffffffffffff'
+DEF_UUID = 'unknown'
 DEF_OS = 'unknown'
 DEF_VARIANT = 'unknown'
 DEF_REPO = 'unknown'
@@ -206,13 +206,15 @@ FEDORA_REPOS = {
     'modular31' : ("fed_mod",31),
     'modular32' : ("fed_mod",32),
     'modular33' : ("fed_mod",33),
-    'modularf27' : ("fed_mod",34),
-    'modularf28' : ("fed_mod",35),
-    'modularf29' : ("fed_mod",36),
-    'modularf30' : ("fed_mod",37),
-    'modularf31' : ("fed_mod",38),
-    'modularf32' : ("fed_mod",39),
-    'modularf33' : ("fed_mod",40),
+    'modularf27' : ("fed_mod",27),
+    'modularf28' : ("fed_mod",28),
+    'modularf29' : ("fed_mod",29),
+    'modularf30' : ("fed_mod",30),
+    'modularf31' : ("fed_mod",31),
+    'modularf32' : ("fed_mod",32),
+    'modularf33' : ("fed_mod",33),
+    'modularrawhide' : ("fed_mod",-1),
+    'modularfrawhide' : ("fed_mod",-1),
     'rhel4'     : ("rhel",4),
     'rhel5'     : ("rhel",5),
     'rhel6'     : ("rhel",6),
