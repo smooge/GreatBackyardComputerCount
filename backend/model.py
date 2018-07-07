@@ -1,10 +1,8 @@
 # This file contains model class for our database
 
-
-
 from datetime import datetime
 from sqlalchemy import Table, Column, Integer, String, DateTime, ForeignKey
-from sqlalchemy import relationship, backref
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declaritive import declaritive_base
 
 Base = declaritive_base()

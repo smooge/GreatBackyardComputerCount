@@ -21,3 +21,4 @@ This package is meant to have all the database related models and code
 for the Great Backyard Computer Count.
 """
 
+import .model
