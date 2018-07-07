@@ -74,7 +74,6 @@ class LU_Release(Base):
     +========+===============+
     | **PK** | **ReleaseID** |
     +========+===============+
-    | **FK** | Operating Sys |
     +--------+---------------+
     |        | Short Name    |
     +--------+---------------+
@@ -90,14 +89,11 @@ class LU_Release(Base):
 
     __tablename__ = 'LU_Release'
     my_id = Column(Integer,primary_key=True, nullable=False)
-    fk_os = Column(Integer, ForeignKey=('LU_OS'), nullable=False)
     short_name = Column(String(20), unique=True, nullable=False)
     long_name = Column(String(80),  nullable=False)
     description = Column(String(1024), nullable=True)
     release_date = Column(Date, nullable=True)
     eol_date = Column(Date, nullable=True)
-
-    os = relationship('LU_OS')
 
     def __init__(self, init_short, init_long, init_description, init_rel, init_eol):
         self.short_name = init_short
