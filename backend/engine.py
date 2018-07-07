@@ -52,7 +52,7 @@ def insert_variant( session, s_name, l_name, desc ):
     """ 
     A wrapper to insert an architecture into proper table 
     """
-    my_os = model.LU_OS(
+    variant = model.LU_OS(
         short_name = s_name,
         long_name = l_name,
         description = desc)
