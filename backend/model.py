@@ -4,12 +4,13 @@
 
 from datetime import datetime
 from sqlalchemy import Table, Column, Integer, String, DateTime, ForeignKey
-from sqlalchemy import relationship
+from sqlalchemy import relationship, backref
+from sqlalchemy.ext.declaritive import declaritive_base
 
-gbcc_associations = Table(
-)
+Base = declaritive_base()
 
 
+## Lookup Table for Architectures
 class LU_Architecture(Base):
     """
     +------------------------+
@@ -31,6 +32,7 @@ class LU_Architecture(Base):
     long_name = Column(String(80), nullable=False)
     description = Column(String(1024), nullable=True)
 
+
     def __init__(self, init_short, init_long, init_description):
         self.short_name = init_short
         self.long_name = init_long
@@ -40,6 +42,31 @@ class LU_Architecture(Base):
         return "<Architecture(short_name='%s', long_name='%s',description='%s')>" % (self.short_name, self.long_name, self.description)
 
 
+## Lookup Table for OS
+class LU_OS(Base):
+    """
+    +------------------------+
+    |  LURelease Table       |
+    +========+===============+
+    | **PK** | **ReleaseID** |
+    +========+===============+
+    |        | Short Name    |
+    +--------+---------------+
+    |        | Long Name     |
+    +--------+---------------+
+    |        | Description   |
+    +--------+---------------+
+    """
+    __tablename__ = 'LU_OS'
+    my_id = Column(Integer,primary_key=True, nullable=False)
+    short_name = Column(String(20), unique=True, nullable=False)
+    long_name = Column(String(80),  nullable=False)
+    description = Column(String(1024), nullable=True)
+
+    def __repr__(self):
+        return "<Operating System(short_name='%s', long_name='%s',description='%s')>" % (self.short_name, self.long_name, self.description)
+
+
 class LU_Release(Base):
     """
     +------------------------+
@@ -47,6 +74,8 @@ class LU_Release(Base):
     +========+===============+
     | **PK** | **ReleaseID** |
     +========+===============+
+    | **FK** | Operating Sys |
+    +--------+---------------+
     |        | Short Name    |
     +--------+---------------+
     |        | Long Name     |
@@ -61,11 +90,14 @@ class LU_Release(Base):
 
     __tablename__ = 'LU_Release'
     my_id = Column(Integer,primary_key=True, nullable=False)
+    fk_os = Column(Integer, ForeignKey=('LU_OS'), nullable=False)
     short_name = Column(String(20), unique=True, nullable=False)
     long_name = Column(String(80),  nullable=False)
     description = Column(String(1024), nullable=True)
     release_date = Column(Date, nullable=True)
     eol_date = Column(Date, nullable=True)
+
+    os = relationship('LU_OS')
 
     def __init__(self, init_short, init_long, init_description, init_rel, init_eol):
         self.short_name = init_short
@@ -154,17 +186,19 @@ class DailyCount(Base):
     +========+===============+
     |        | Date          |
     +--------+---------------+
-    |        | Arch_ID       |
+    | **FK** | Arch_ID       |
     +--------+---------------+
-    |        | Release_ID    |
+    | **FK** | OS_ID         |
     +--------+---------------+
-    |        | Variant_ID    |
+    | **FK** | Release_ID    |
     +--------+---------------+
-    |        | Country_ID    |
+    | **FK** | Variant_ID    |
     +--------+---------------+
-    |        | IP_Address    |
+    | **FK** | Country_ID    |
     +--------+---------------+
-    |        | UUID          |
+    | **FK** | IP_Address    |
+    +--------+---------------+
+    | **FK** | UUID          |
     +--------+---------------+
     |        | Count         |
     +--------+---------------+
@@ -174,15 +208,22 @@ class DailyCount(Base):
 
     my_id = Column(Integer, primary_key=True, nullable=False)
     date = Column(DateTIme)
-    fk_arch = Column(Integer,ForeignKey('LU_Architecture.my_id'))
-    fk_release = Column(Integer,ForeignKey('LU_Release.my_id'))
-    fk_variant = Column(Integer,ForeignKey('LU_Variant.my_id'))
-    fk_country = Column(Integer,ForeignKey('LU_Country.my_id'))
-    fk_address = Column(Integer,ForeignKey('LU_Address.my_id'))
+    fk_arch = Column(Integer,ForeignKey('LU_Architecture.my_id', nullable=False))
+    fk_os = Column(Integer,ForeignKey('LU_OS.my_id', nullable=False))
+    fk_release = Column(Integer,ForeignKey('LU_Release.my_id', nullable=False))
+    fk_variant = Column(Integer,ForeignKey('LU_Variant.my_id', nullable=False))
+    fk_country = Column(Integer,ForeignKey('LU_Country.my_id', nullable=False))
+    fk_address = Column(Integer,ForeignKey('LU_Address.my_id', nullable=False))
     fk_uuid = Column(Integer,ForeignKey('LU_UUID.my_id'))
     count = Column(Integer)
 
-
+    arch    = relationship('LU_Architecture')
+    os      = relationship('LU_OS')
+    release = relationship('LU_Release')
+    variant = relationship('LU_Variant')
+    country = relationship('LU_Country')
+    address = relationship('LU_Address')
+    uuid    = relationship('LU_UUID')
 
 ##
 ## End of file
