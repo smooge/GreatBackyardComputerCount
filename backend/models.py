@@ -29,6 +29,27 @@ def create_db( db_url, db_debug=False):
 
    return db_session
 
+##
+## Source https://stackoverflow.com/questions/2546207/does-sqlalchemy-have-an-equivalent-of-djangos-get-or-create
+## Credit: Patrick Uiterwijk for mentioning it.
+def get_or_create(session, model, **kwargs):
+   """
+
+   A utility to check to see if an entry exists. If it does not add
+   it to the database.
+
+   """
+   instance = session.query(model).filter_by(**kwargs).first()
+   if instance:
+      return instance
+
+   else:
+      instance = model(**kwargs)
+      session.add(instance)
+      session.commit()
+      return instance
+
+
 
 ## Lookup Table for Architectures
 class LU_Architecture(Base):
@@ -53,10 +74,10 @@ class LU_Architecture(Base):
     description = sa.Column(sa.String(1024), nullable=True)
 
 
-    def __init__(self, s_name, l_name, desc):
-        self.short_name = s_name
-        self.long_name = l_name
-        self.description = desc
+    def __init__(self, short_name, long_name, description):
+        self.short_name = short_name
+        self.long_name = long_name
+        self.description = description
 
     def __repr__(self):
         return "<Architecture(short_name='%s', long_name='%s',description='%s')>" % (self.short_name, self.long_name, self.description)
@@ -83,10 +104,10 @@ class LU_OS(Base):
     long_name = sa.Column(sa.String(80),  nullable=False)
     description = sa.Column(sa.String(1024), nullable=True)
 
-    def __init__(self, s_name, l_name, desc):
-        self.short_name = s_name
-        self.long_name = l_name
-        self.description = desc
+    def __init__(self, short_name, long_name, description):
+        self.short_name = short_name
+        self.long_name = long_name
+        self.description = description
 
     def __repr__(self):
         return "<Operating System(short_name='%s', long_name='%s',description='%s')>" % (self.short_name, self.long_name, self.description)
@@ -120,12 +141,31 @@ class LU_Release(Base):
     release_date = sa.Column(sa.Date, nullable=True)
     eol_date = sa.Column(sa.Date, nullable=True)
 
-    def __init__(self, init_short, init_long, init_description, init_rel, init_eol):
-        self.short_name = init_short
-        self.long_name = init_long
-        self.description = init_description
-        self.release_date = init_rel
-        self.eol_date = init_eol
+    def __init__(self, short_name, long_name, description, release_date, eol_date):
+       if type(release_date) is datetime:
+          rel = release_date
+       else:
+          try:
+             rel=datetime.strptime(release_date,"%Y-%m-%d")
+          except:
+             rel=datetime(1970,1,2)
+
+       if type(init_eol) is datetime:
+          eol = init_eol
+       else:
+          try:
+             eol=datetime.strptime(eol_date,"%Y-%m-%d")
+          except:
+             eol=datetime(1970,1,2)
+
+       self.short_name = short_name
+       self.long_name = long_name
+       self.description = description
+       self.release_date = rel
+       self.eol_date = eol
+
+    def __repr__(self):
+       return "<Releasee(short='%s', long='%s', description='%s', release='%s', eol='%s')>" % (self.short_name, self.long_name, self.description, self.release_date.isoformat(),self.eol_date.isoformat())
 
 class LU_Variant(Base):
     """
@@ -144,9 +184,9 @@ class LU_Variant(Base):
     name = sa.Column(sa.String(20), unique=True, nullable=False)
     description = sa.Column(sa.String(1024), nullable=True)
     
-    def __init__(self, init_name, init_description):
-        self.name = init_short
-        self.description = init_description
+    def __init__(self, name, description):
+        self.name = name
+        self.description = description
 
     def __repr__(self):
         return "<Release(name='%s', description='%s')>" % (self.name, self.description)
@@ -168,12 +208,12 @@ class LU_Country(Base):
     short_name = sa.Column(sa.String(4), unique=True, nullable=False)
     long_name = sa.Column(sa.String(80), unique=True, nullable=True)
 
-    def __init__(self, init_short, init_long):
-        self.short_name = init_short
-        self.long_name = init_long
+    def __init__(self, short_name, long_name):
+       self.short_name = short_name
+       self.long_name = long_name
 
     def __repr__(self):
-        return "<Release(short_name='%s', long_name='%s',)>" % (self.short_name, self.long_name)
+       return "<Country(short_name='%s', long_name='%s',)>" % (self.short_name, self.long_name)
 
 class LU_Address(Base):
     """
@@ -187,6 +227,11 @@ class LU_Address(Base):
     my_id = sa.Column(sa.Integer,primary_key=True, nullable=False)
     ip_address = sa.Column(sa.String(40), unique=True, nullable=False)
 
+    def __init__(self, ip_address):
+       self.ip_address = ip_address
+
+    def __repr(self):
+       return "<IP(address='%s')>" % (self.ip_address)
 
 class LU_UUID(Base):
     """
@@ -200,6 +245,12 @@ class LU_UUID(Base):
     __tablename__ = 'LU_UUID'
     my_id = sa.Column(sa.Integer,primary_key=True, nullable=False)
     uuid = sa.Column(sa.String(36), unique=True, nullable=True)
+    
+    def __init__(self, uuid):
+       self.uuid =  uuid
+
+    def __repr(self):
+       return "<UUID('%s')>" % (self.uuid)
     
 
 class DailyCount(Base):
