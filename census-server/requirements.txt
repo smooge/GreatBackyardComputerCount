@@ -1,6 +1,8 @@
 certifi==2018.4.16
 chardet==3.0.4
 Flask==0.10.1
+Flask-SQLalchemy==2.3.2
+SQLAlchemy==0.9.8
 geoip2==2.9.0
 idna==2.7
 ipaddress==1.0.22
