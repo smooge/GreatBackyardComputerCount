@@ -1,3 +1,4 @@
+'unknown' , 'unknown', 'Unknown Architecture'
 'aarch64' , 'aarch64', 'Arm (64 bit little endian)'
 'alpha' , 'alpha', 'DEC Alpha (64 bit big endian)'
 'arm' , 'arm', 'ARM (32 bit)'

@@ -6,6 +6,12 @@ import sqlalchemy as sa
 
 from sqlalchemy.orm import relationship, backref, sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+
+import sys
+sys.path.append('../')
+import config
+
 
 Base = declarative_base()
 
@@ -31,25 +37,53 @@ def create_db( db_url, db_debug=False):
 
 ##
 ## Source https://stackoverflow.com/questions/2546207/does-sqlalchemy-have-an-equivalent-of-djangos-get-or-create
+## http://skien.cc/blog/2014/01/15/sqlalchemy-and-race-conditions-implementing/
 ## Credit: Patrick Uiterwijk for mentioning it.
-def get_or_create(session, model, **kwargs):
+def get_one_or_create(session, model, **kwargs):
+   """
+   A utility to check to see if an entry exists. If it does not add
+   it to the database.
+   Derived from: http://skien.cc/blog/2014/01/15/sqlalchemy-and-race-conditions-implementing/
+
+   """
+   created = False
+
+   try:
+      instance = session.query(model).filter_by(**kwargs).one()
+   except NoResultFound:
+      kwargs.update({})
+      try:
+         instance = model(**kwargs)
+         session.add(instance)
+         session.commit()
+         created = True
+      except IntegrityError:
+         session.rollback()
+         try:
+            instance = session.query(model).filter_by(**kwargs).one()
+         except NoResultFound:
+            instance = None
+   except MultipleResultsFound:
+      instance =session.query(model).filter_by(**kwargs).first()
+   return (instance, created)
+
+
+
+def get_only_one(session, model, **kwargs):
    """
 
    A utility to check to see if an entry exists. If it does not add
    it to the database.
 
    """
-   instance = session.query(model).filter_by(**kwargs).first()
-   if instance:
-      return instance
-
-   else:
-      instance = model(**kwargs)
-      session.add(instance)
-      session.commit()
-      return instance
-
-
+   ## TODO: FIX THIS AS I AM USING A MAGIC VALUE HERE.
+   try:
+      instance = session.query(model).filter_by(**kwargs).one()
+   except NoResultFound:
+      instance =session.query(model).filter_by(config.DEFAULT_SQL).one()
+   except MultipleResultsFound:
+      instance =session.query(model).filter_by(**kwargs).first()
+   return instance
 
 ## Lookup Table for Architectures
 class LU_Architecture(Base):
@@ -138,8 +172,8 @@ class LU_Release(Base):
     short_name = sa.Column(sa.String(20), unique=True, nullable=False)
     long_name = sa.Column(sa.String(80),  nullable=False)
     description = sa.Column(sa.String(1024), nullable=True)
-    release_date = sa.Column(sa.Date, nullable=True)
-    eol_date = sa.Column(sa.Date, nullable=True)
+    release_date = sa.Column(sa.DateTime, nullable=True)
+    eol_date = sa.Column(sa.DateTime, nullable=True)
 
     def __init__(self, short_name, long_name, description, release_date, eol_date):
        if type(release_date) is datetime:
@@ -150,8 +184,8 @@ class LU_Release(Base):
           except:
              rel=datetime(1970,1,2)
 
-       if type(init_eol) is datetime:
-          eol = init_eol
+       if type(eol_date) is datetime:
+          eol = eol_date
        else:
           try:
              eol=datetime.strptime(eol_date,"%Y-%m-%d")
@@ -165,7 +199,7 @@ class LU_Release(Base):
        self.eol_date = eol
 
     def __repr__(self):
-       return "<Releasee(short='%s', long='%s', description='%s', release='%s', eol='%s')>" % (self.short_name, self.long_name, self.description, self.release_date.isoformat(),self.eol_date.isoformat())
+       return "<Release(short='%s', long='%s', description='%s', release='%s', eol='%s')>" % (self.short_name, self.long_name, self.description, self.release_date.isoformat(),self.eol_date.isoformat())
 
 class LU_Variant(Base):
     """
