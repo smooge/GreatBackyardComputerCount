@@ -21,7 +21,6 @@
 # of the Common Cure Rights Commitment.
 
 
-import csv               # this is a temp to write out logs. replace with alchemy
 import errno
 import geoip2.database   # can't know your places 
 import geoip2.errors     # without geoip2
@@ -50,110 +49,6 @@ except:
 ##
 ## Start our subroutines here
 
-def clean_request(temp_answer):
-    # We sometimes get additional data added onto the yum/dnf requests.
-    spew = temp_answer.split("/")[0]
-    for char in config.CRAP_CHARS:
-        if char in spew:
-            spew = spew.split(char)[0]
-    sanitize = spew.lower()
-    return sanitize
-
-#
-# A routine which takes the date from apache format to standard RFC3339
-# Please see https://tools.ietf.org/html/rfc3339
-def determine_rfc3339_date(givendate):
-    date_subpart = givendate.split()
-    
-    # We may have been given garbage.. logs are the devil's playground
-    try:
-        [day, month, year] = date_subpart[0].split(":")[0].split('/')
-    except:
-        # string out of index because date corrupted?
-        [day, month, year ] = config.DEF_DATE # epoch
-    
-    ret_str = "%s-%s-%s" % (year, config.APACHE_MONTHS[month], day)
-
-    return ret_str
-
-def determine_repo(asked_repo):
-    if asked_repo is None:
-        return (config.DEF_OS,config.DEF_RELEASE)
-
-    # start the process of cleaning out various weirdness clients have
-    spew = clean_request(asked_repo)
-
-    # Clean off prewords with repodata
-    for word in config.REPO_PREWORDS:
-        if word in spew:
-            spew = spew.replace(word, config.REPO_CODE)
-
-    # Clean out subwords inside of the repo
-    for word in config.REPO_SUBWORDS:
-        if word in spew:
-            spew = spew.replace(word, "")
-
-    if "-" in spew:
-        spew = re.sub("-+", "", spew)
-
-    # OK clean out any other garbage and remove end of line
-    sanitize = spew.strip()
-
-
-    if sanitize in config.REPO_KEYS:
-        return config.REPO_NAMES[sanitize]
-    else:
-        return (config.DEF_OS,config.DEF_RELEASE)
-
-# This is similar to the repos but has a lot less garbage normally
-def determine_arch(asked_arch):
-    sanitize = clean_request(asked_arch)
-    if sanitize in config.KNOWN_ARCHES:
-        return config.KNOWN_ARCHES[sanitize]
-    else:
-        return config.DEF_ARCH
-
-## Determine variants
-def determine_variant(asked_variant):
-    if asked_variant is None:
-        return config.DEF_VARIANT
-
-    sanitized = clean_request(asked_variant)
-    if sanitized in config.KNOWN_VARIANTS.keys():
-        return config.KNOWN_VARIANTS[sanitized]
-    else:
-        return config.DEF_VARIANT
-
-# based off of https://gist.github.com/ShawnMilo/7777304
-def determine_uuid(asked_uuid):
-    if asked_uuid is None:
-        return config.DEF_UUID
-    try:
-        asked_uuid = asked_uuid.lower()
-    except:
-        return config.DEF_UUID
-    try:
-        sanitize = str(UUID(asked_uuid, version=4))
-    except:
-        return config.DEF_UUID
-    if sanitize == asked_uuid:
-        return sanitize
-    else:
-        return config.DEF_UUID
-
-# Determine if client user agent is known
-def determine_client(asked_client):
-    if asked_client is None:
-        return config.DEF_CLIENT
-    try:
-        asked_client = asked_client.lower()
-    except:
-        return config.DEF_CLIENT
-
-    for key,value in config.KNOWN_CLIENTS.iteritems():
-        if key in asked_client:
-            return value
-    return config.DEF_CLIENT
 
 #
 # A subroutine to try to determine our get data (field 7 of normal apache log)

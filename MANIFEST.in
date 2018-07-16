@@ -1,0 +1,4 @@
+include COMMITMENT  LICENSE  README.rst
+include requirements.txt
+include initialize_db.py setup.py
+recursive include GreatBackyardComputerCount

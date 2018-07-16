@@ -1,4 +1,4 @@
-"unknown", "Unknown country"
+"unknown","Unknown country"
 "A1","Anonymous Proxy"
 "A2","Satellite Provider"
 "O1","Other Country"
@@ -32,7 +32,7 @@
 "BM","Bermuda"
 "BN","Brunei Darussalam"
 "BO","Bolivia"
-"BQ","Bonaire
+"BQ","Bonaire"
 "BR","Brazil"
 "BS","Bahamas"
 "BT","Bhutan"
@@ -42,9 +42,9 @@
 "BZ","Belize"
 "CA","Canada"
 "CC","Cocos (Keeling) Islands"
-"CD","Congo
+"CD","Democratic Republic of Congo"
 "CF","Central African Republic"
-"CG","Congo"
+"CG","Republic of Congo"
 "CH","Switzerland"
 "CI","Cote d'Ivoire"
 "CK","Cook Islands"
@@ -76,7 +76,7 @@
 "FI","Finland"
 "FJ","Fiji"
 "FK","Falkland Islands (Malvinas)"
-"FM","Micronesia
+"FM","Micronesia"
 "FO","Faroe Islands"
 "FR","France"
 "GA","Gabon"
@@ -111,7 +111,7 @@
 "IN","India"
 "IO","British Indian Ocean Territory"
 "IQ","Iraq"
-"IR","Iran
+"IR","Iran"
 "IS","Iceland"
 "IT","Italy"
 "JE","Jersey"
@@ -124,8 +124,8 @@
 "KI","Kiribati"
 "KM","Comoros"
 "KN","Saint Kitts and Nevis"
-"KP","Korea
-"KR","Korea
+"KP","North Korea"
+"KR","South Korea"
 "KW","Kuwait"
 "KY","Cayman Islands"
 "KZ","Kazakhstan"
@@ -142,7 +142,7 @@
 "LY","Libyan Arab Jamahiriya"
 "MA","Morocco"
 "MC","Monaco"
-"MD","Moldova
+"MD","Moldova"
 "ME","Montenegro"
 "MF","Saint Martin"
 "MG","Madagascar"
@@ -232,7 +232,7 @@
 "TT","Trinidad and Tobago"
 "TV","Tuvalu"
 "TW","Taiwan"
-"TZ","Tanzania
+"TZ","Tanzania"
 "UA","Ukraine"
 "UG","Uganda"
 "UM","United States Minor Outlying Islands"
@@ -242,8 +242,8 @@
 "VA","Holy See (Vatican City State)"
 "VC","Saint Vincent and the Grenadines"
 "VE","Venezuela"
-"VG","Virgin Islands
-"VI","Virgin Islands
+"VG","British Virgin Islands"
+"VI","US Virgin Islands"
 "VN","Vietnam"
 "VU","Vanuatu"
 "WF","Wallis and Futuna"

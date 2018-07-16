@@ -1,9 +1,9 @@
-'unknown', 'Unknown OS', 'Unknown'
-'Fedora', 'Fedora Linux', 'http://getfedora.org'
-'FedAtomic','Fedora Atomic Linux', 'http://getfedora.org'
-'FedCore','Fedora CoreOS Linux', 'http://getfedora.org'
-'CentOS', 'CentOS Linux', 'http://www.centos.org'
-'RHEL', 'Red Hat Enterprise Linux', 'http://www.redhat.com'
-'SciLin', 'Scientific Linux', 'https://www.scientificlinux.org/'
-'Redsleeve', 'RedSleeve Linux', 'http://www.redsleeve.org/'
-'EL', 'Enterprise Linux', 'Generic EL name when unable to determine'
+"unknown","Unknown OS","Unknown"
+"Fedora","Fedora Linux","http://getfedora.org"
+"FedAtomic","Fedora Atomic Linux","http://getfedora.org"
+"FedCore","Fedora CoreOS Linux","http://getfedora.org"
+"CentOS","CentOS Linux","http://www.centos.org"
+"RHEL","Red Hat Enterprise Linux","http://www.redhat.com"
+"SciLin","Scientific Linux","https://www.scientificlinux.org/"
+"Redsleeve","RedSleeve Linux","http://www.redsleeve.org/"
+"EL","Enterprise Linux","Generic EL name when unable to determine"
