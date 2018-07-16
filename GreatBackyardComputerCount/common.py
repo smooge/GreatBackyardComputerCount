@@ -96,7 +96,7 @@ def determine_os(asked_os):
         return os
     sanitized = clean_request(asked_os)
     if sanitized in config.KNOWN_OS.keys():
-        os = config.KNOWN_OS.keys[sanitized]
+        os = config.KNOWN_OS[sanitized]
     return os
 
 ## Determine release
@@ -105,8 +105,8 @@ def determine_release(asked_rel):
     if asked_rel is None:
         return release
     sanitized = clean_request(asked_rel)
-    if sanitized in config.KNOWN_RELEASE.keys():
-        release = config.KNOWN_RELEASE.keys[sanitized]
+    if sanitized in config.KNOWN_RELEASES.keys():
+        release = config.KNOWN_RELEASES[sanitized]
     return release
 
 ## Determine variants

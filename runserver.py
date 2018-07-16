@@ -22,22 +22,21 @@
 """
 Program to run the FLASK app for human debugging.
 """
-import errno, sys
-import logging           # and to log our errors
 
+import logging
 
 from GreatBackyardComputerCount import config
-from GreatBackyardComputerCount.db import models
-from GreatBackyardComputerCount import app
+from GreatBackyardComputerCount.app import engine
 
-if __name__ == "__main__":
 
-    logHandler = logging.FileHandler(filename=config.LOGFILE)
-    formatter = logging.Formatter('%(asctime)s %(message)s')
-    logHandler.setFormatter(formatter)
-    logHandler.setLevel(logging.INFO)
+logHandler = logging.FileHandler(filename=config.LOGFILE)
+formatter = logging.Formatter('%(asctime)s %(message)s')
+logHandler.setFormatter(formatter)
+logHandler.setLevel(logging.INFO)
 
-    # # set the app logger level
-    # app.logger.setLevel(logging.INFO)
-    # app.logger.addHandler(logHandler)
-    app.run(host='0.0.0.0', port=5000, debug=False)
+app = engine()
+# set the app logger level
+app.logger.setLevel(logging.INFO)
+app.logger.addHandler(logHandler)
+app.run(host='0.0.0.0', port=5000, debug=False)
+

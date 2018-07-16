@@ -94,6 +94,7 @@ def get_one_or_create(session, model, **kwargs):
    return (instance, created)
 
 def add_event(session, date, arch, os, release, variant, country, address, uuid, client):
+   instance = None
    # Determine if we got a date set up correctly or by string
    if type(date) is not datetime:
       try:
@@ -142,12 +143,13 @@ def add_event(session, date, arch, os, release, variant, country, address, uuid,
          client=client,
       ).one()
    except NoResultFound:
-      instance = Events( date, arch, os, release, variant, country, address, uuid, client)
-
+      try:
+         instance = Events(date=date,arch=arch,os=os, release=release, variant=variant, country=country, address=address, uuid=uuid, client=client)
+      except Exception, e:
+         print "AAAA",e, date,arch,os,release,variant,country,address,uuid,client
       session.add(instance)
       session.commit()
    except MultipleResultsFound:
-
       instance =  session.query(Events).filter_by(
          date=date,
          arch=arch,
@@ -160,7 +162,8 @@ def add_event(session, date, arch, os, release, variant, country, address, uuid,
          client=client,
       ).first()
    except Exception, e:
-      print e
+      print "FFFF", e, date,arch,os,release,variant,country,address,uuid,client
+
    return instance
       
 
@@ -169,15 +172,14 @@ def add_event(session, date, arch, os, release, variant, country, address, uuid,
 def get_only_one(session, model, **kwargs):
    """
 
-   A utility to check to see if an entry exists. If it does not add
-   it to the database.
+   A utility to check to see if an entry exists. If it does not return the default.
 
    """
-   ## TODO: FIX THIS AS I AM USING A MAGIC VALUE HERE.
+   instance = None
    try:
       instance = session.query(model).filter_by(**kwargs).one()
    except NoResultFound:
-      instance =session.query(model).filter_by(config.DEF_SQL).one()
+      instance = session.query(model).first()
    except MultipleResultsFound:
       instance =session.query(model).filter_by(**kwargs).first()
    return instance

@@ -69,18 +69,36 @@ http://www.smoogespace.com/downloads/census/
 LOGFILE= basedir+ '/GBCC_server.log'
 
 KNOWN_VARIANTS={
-    'workstation':'workstation',
-    'server': 'server', 
+    'unknown':'unknown',
+    'atomichost':'atomichost',
+    'atomicworkstation':'atomicworkstation',
+    'cinnamon':'cinnamon',
+    'cloud':'cloud',
+    'container':'container',
     'desktop': 'desktop',
+    'gnome': 'gnome',
+    'kde': 'kde',
+    'lxde': 'lxde',
+    'lxqt': 'lxqt',
+    'mate': 'mate',
+    'minimal': 'minimal',
+    'modular': 'modular',
+    'netinstall': 'netinstall',
+    'server': 'server', 
     'silverblue': 'silverblue',
+    'soas': 'soas',
+    'workstation':'workstation',
+    'xfce': 'xfce',
 }
-KNOWN_OSES={
-    'fedora': 'fedora',
-    'centos': 'centos',
-    'rhel':'rhel',
-    'scilin': 'scilin',
-    'el':'el',
-    'coreos':'coreos',
+
+KNOWN_OS={
+    'unknown':'unknown',
+    'fedora': 'Fedora',
+    'centos': 'CentOS',
+    'rhel':'RHEL',
+    'scilin': 'SciLin',
+    'el':'EL',
+    'redsleeve':'Redsleeve',
 }
 
 KNOWN_RELEASES={
