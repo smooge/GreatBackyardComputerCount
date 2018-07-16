@@ -51,34 +51,6 @@ def determine_apache_date(givendate):
     except:
         date = config.DEF_DATE
 
-def determine_repo(asked_repo):
-    if asked_repo is None:
-        return (config.DEF_OS,config.DEF_RELEASE)
-
-    # start the process of cleaning out various weirdness clients have
-    spew = clean_request(asked_repo)
-
-    # Clean off prewords with repodata
-    for word in config.REPO_PREWORDS:
-        if word in spew:
-            spew = spew.replace(word, config.REPO_CODE)
-
-    # Clean out subwords inside of the repo
-    for word in config.REPO_SUBWORDS:
-        if word in spew:
-            spew = spew.replace(word, "")
-
-    if "-" in spew:
-        spew = re.sub("-+", "", spew)
-
-    # OK clean out any other garbage and remove end of line
-    sanitize = spew.strip()
-
-    if sanitize in config.REPO_KEYS:
-        return config.REPO_NAMES[sanitize]
-    else:
-        return (config.DEF_OS,config.DEF_RELEASE)
-
 # This is similar to the repos but has a lot less garbage normally
 def determine_arch(asked_arch):
     # Set up a default answer
@@ -108,6 +80,35 @@ def determine_release(asked_rel):
     if sanitized in config.KNOWN_RELEASES.keys():
         release = config.KNOWN_RELEASES[sanitized]
     return release
+
+def determine_repo(asked_repo):
+    if asked_repo is None:
+        return (config.DEF_OS,config.DEF_RELEASE)
+
+    # start the process of cleaning out various weirdness clients have
+    spew = clean_request(asked_repo)
+
+    # Clean off prewords with repodata
+    for word in config.REPO_PREWORDS:
+        if word in spew:
+            spew = spew.replace(word, config.REPO_CODE)
+
+    # Clean out subwords inside of the repo
+    for word in config.REPO_SUBWORDS:
+        if word in spew:
+            spew = spew.replace(word, "")
+
+    if "-" in spew:
+        spew = re.sub("-+", "", spew)
+
+    # OK clean out any other garbage and remove end of line
+    sanitize = spew.strip()
+
+    if sanitize in config.REPO_KEYS:
+        return config.REPO_NAMES[sanitize]
+    else:
+        return (config.DEF_OS,config.DEF_RELEASE)
+
 
 ## Determine variants
 def determine_variant(asked_variant):

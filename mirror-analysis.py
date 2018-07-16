@@ -30,11 +30,13 @@ import os
 import re
 import string
 import sys
-import time              # get your time, get your red hot time
+import csv 
 
 from uuid import UUID
 
-import config
+from GreatBackyardComputerCount import config
+from GreatBackyardComputerCount import common
+from GreatBackyardComputerCount.db import models
 
 pattern = re.compile("".join(config.REPO_LOGFMT))
 repo_keys = config.REPO_KEYS
@@ -48,6 +50,9 @@ except:
 
 ##
 ## Start our subroutines here
+#
+# CSV files 
+
 
 
 #
@@ -103,13 +108,13 @@ def parse_line(our_line):
             except:
                 my_country = config.DEF_COUNTRY
                         
-            my_time     = determine_rfc3339_date(our_dict['time']) 
+            my_time     = common.determine_rfc3339_date(our_dict['time']) 
             r,a,u,v  = parse_request(our_dict['request'])
-            my_os,my_release  = determine_repo(r)
-            my_arch     = determine_arch(a)
-            my_uuid     = determine_uuid(u)
-            my_variant  = determine_variant(v)
-            my_client   = determine_client(our_dict['user_agent'])
+            my_os,my_release  = common.determine_repo(r)
+            my_arch     = common.determine_arch(a)
+            my_uuid     = common.determine_uuid(u)
+            my_variant  = common.determine_variant(v)
+            my_client   = common.determine_client(our_dict['user_agent'])
             
             my_data = {
                 config.CSV_FIELD[0] : my_time,
