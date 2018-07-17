@@ -40,19 +40,6 @@ DB_DEBUG=False
 
 GEO_DB_COUNTRY_LOC = basedir + '/GeoIP2/GeoIP2-Country.mmdb'
 
-CSV_FILE = basedir + '/GBCC.csv'
-CSV_FIELD = [
-    "Date", 
-    "IP",
-    "Country",
-    "UUID",
-    "OS",
-    "Variant",
-    "Release",
-    "Arch",
-    "ClientApp"
-]
-
 # Log files get a lot of weird things stuck in them.. if we see these
 # ignore them..
 CRAP_CHARS = ['/', '$', '!', '#', '%', '&', "'", '"', "(", ")", "*", "+", ",", ":", ";", "<", ">", "=", "?", "@", "[", "^", "|"]
@@ -211,7 +198,7 @@ MIRRORS='fedora'
 # We do not define the CSV_FILE here as it should be an argument of
 # the calling analysis program.
 #
-CSV_FILE = basedir + '/mirrors-analized.csv'
+CSV_FILE = basedir + '/mirrors-analysis.csv'
 
 CSV_FIELD = [
     "Date", 

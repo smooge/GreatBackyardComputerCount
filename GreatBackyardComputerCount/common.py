@@ -32,6 +32,7 @@ from datetime import datetime
 import config
 from db import models
 
+
 def clean_request(temp_answer):
     # We sometimes get additional data added onto the yum/dnf requests.
     spew = temp_answer.split("/")[0]
@@ -46,10 +47,14 @@ def clean_request(temp_answer):
 # format 
 
 def determine_apache_date(givendate):
+    # strptime doesn't understand timezones so we have to 
+    # remove it from the string
+    date_subpart = givendate.split()
     try:
-        date = datetime.strptime(givendate, "%d/%b/%Y:%H:%M:%S %z")
+        date = datetime.strptime(date_subpart[0], "%d/%b/%Y:%H:%M:%S")
     except:
         date = config.DEF_DATE
+    return date
 
 # This is similar to the repos but has a lot less garbage normally
 def determine_arch(asked_arch):
@@ -81,7 +86,7 @@ def determine_release(asked_rel):
         release = config.KNOWN_RELEASES[sanitized]
     return release
 
-def determine_repo(asked_repo):
+def determine_repo(asked_repo, regex):
     if asked_repo is None:
         return (config.DEF_OS,config.DEF_RELEASE)
 
@@ -99,7 +104,7 @@ def determine_repo(asked_repo):
             spew = spew.replace(word, "")
 
     if "-" in spew:
-        spew = re.sub("-+", "", spew)
+        spew = regex.sub("-+", "", spew)
 
     # OK clean out any other garbage and remove end of line
     sanitize = spew.strip()

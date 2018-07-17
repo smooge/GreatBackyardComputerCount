@@ -31,6 +31,7 @@ import errno, sys
 import time              # get your time, get your red hot time
 import geoip2.database   # can't know your places 
 import geoip2.errors     # without geoip2
+import maxminddb.const
 import logging           # and to log our errors
 import logging.handlers
 
@@ -47,8 +48,15 @@ from . import common
 def engine():
     app = flask.Flask(__name__)
 
-    reader_country = geoip2.database.Reader(config.GEO_DB_COUNTRY_LOC)
-    session = models.init_db(config.DB_URL,config.DB_DEBUG,create=False)
+    ##
+    ## FIXME (doing country look ups slows down the processing of log files
+    ## by 10.)
+    reader_country = geoip2.database.Reader(config.GEO_DB_COUNTRY_LOC,
+                                            mode=maxminddb.const.MODE_MEMORY
+    )
+    session = models.init_db(config.DB_URL,
+                             config.DB_DEBUG,create=False,
+    )
 
     @app.route("/census",  methods=('get', 'post'))
     def census():
