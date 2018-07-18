@@ -45,21 +45,22 @@ def init_db( db_url, db_debug=False, create=False):
    A tool to set up the database
    """
 
-   engine = sa.create_engine(db_url, echo=db_debug)
+   db_engine = sa.create_engine(db_url, echo=db_debug)
    if create:
-      Base.metadata.create_all(bind=engine)
+      Base.metadata.create_all(bind=db_engine)
 
    # Source: https://docs.sqlalchemy.org/en/latest/dialects/sqlite.html
    # see section 'sqlite-foreign-keys'
    if db_url.startswith('sqlite:'):
       def _fk_pragma_on_connect(dbapi_con, con_record):
          dbapi_con.execute("PRAGMA foreign_keys=ON")
-         sa.event.listen(my_engine, 'connect', _fk_pragma_on_connect)
+         sa.event.listen(db_engine, 'connect', _fk_pragma_on_connect)
 
-   db_session = scoped_session(sessionmaker(bind=engine))
+   db_session = scoped_session(sessionmaker(bind=db_engine))
+   db_session.configure(bind=db_engine, autoflush=False, expire_on_commit=False)
    db_session.commit()
 
-   return db_session
+   return db_session,db_engine
 
 ##
 ## Source https://stackoverflow.com/questions/2546207/does-sqlalchemy-have-an-equivalent-of-djangos-get-or-create
@@ -93,7 +94,8 @@ def get_one_or_create(session, model, **kwargs):
       instance =session.query(model).filter_by(**kwargs).first()
    return (instance, created)
 
-def add_event(session, date, arch, os, release, variant, country, address, uuid, client):
+def add_event(session, engine,
+              date, arch, os, release, variant, country, address, uuid, client):
    instance = None
    # Determine if we got a date set up correctly or by string
    if type(date) is not datetime:
@@ -143,12 +145,7 @@ def add_event(session, date, arch, os, release, variant, country, address, uuid,
          client=client,
       ).one()
    except NoResultFound:
-      try:
-         instance = Events(date=date,arch=arch,os=os, release=release, variant=variant, country=country, address=address, uuid=uuid, client=client)
-      except Exception, e:
-         print "AAAA",e, date,arch,os,release,variant,country,address,uuid,client
-      session.add(instance)
-      session.commit()
+      instance = Events(date=date,arch=arch,os=os, release=release, variant=variant, country=country, address=address, uuid=uuid, client=client)
    except MultipleResultsFound:
       instance =  session.query(Events).filter_by(
          date=date,
@@ -161,8 +158,6 @@ def add_event(session, date, arch, os, release, variant, country, address, uuid,
          uuid=uuid,
          client=client,
       ).first()
-   except Exception, e:
-      print "FFFF", e, date,arch,os,release,variant,country,address,uuid,client
 
    return instance
       
@@ -207,11 +202,6 @@ class LU_Architecture(Base):
     description = sa.Column(sa.String(1024), nullable=True)
 
 
-    def __init__(self, name, long_name, description):
-        self.name = name
-        self.long_name = long_name
-        self.description = description
-
     def __repr__(self):
         return "<Architecture(name='%s', long_name='%s',description='%s')>" % (self.name, self.long_name, self.description)
 
@@ -236,11 +226,6 @@ class LU_OS(Base):
     name        = sa.Column(sa.String(20), unique=True, nullable=False)
     long_name   = sa.Column(sa.String(80),  nullable=False)
     description = sa.Column(sa.String(1024), nullable=True)
-
-    def __init__(self, name, long_name, description):
-        self.name = name
-        self.long_name = long_name
-        self.description = description
 
     def __repr__(self):
         return "<Operating System(name='%s', long_name='%s',description='%s')>" % (self.name, self.long_name, self.description)
@@ -317,10 +302,6 @@ class LU_Variant(Base):
     name = sa.Column(sa.String(20), unique=True, nullable=False)
     description = sa.Column(sa.String(1024), nullable=True)
     
-    def __init__(self, name, description):
-        self.name = name
-        self.description = description
-
     def __repr__(self):
         return "<Release(name='%s', description='%s')>" % (self.name, self.description)
 
@@ -341,10 +322,6 @@ class LU_Country(Base):
     name = sa.Column(sa.String(4), unique=True, nullable=False)
     long_name = sa.Column(sa.String(80), unique=True, nullable=True)
 
-    def __init__(self, name, long_name):
-       self.name = name
-       self.long_name = long_name
-
     def __repr__(self):
        return "<Country(name='%s', long_name='%s',)>" % (self.name, self.long_name)
 
@@ -363,9 +340,6 @@ class LU_ClientApp(Base):
     pk_id = sa.Column(sa.Integer,primary_key=True, nullable=False)
     name = sa.Column(sa.String(36), unique=True, nullable=True)
     
-    def __init__(self, name):
-       self.name =  name
-
     def __repr(self):
        return "<UUID('%s')>" % (self.uuid)
 
@@ -382,9 +356,6 @@ class LU_IPAddress(Base):
     __tablename__ = 'LU_IPAddress'
     pk_id = sa.Column(sa.Integer,primary_key=True, nullable=False)
     ip_address = sa.Column(sa.String(40), unique=True, nullable=False)
-
-    def __init__(self, ip_address):
-       self.ip_address = ip_address
 
     def __repr__(self):
        return "<IP(address='%s')>" % (self.ip_address)
@@ -456,80 +427,14 @@ class Events(Base):
     fk_uuid = sa.Column(sa.Integer,sa.ForeignKey('LU_UUID.pk_id'))
     fk_client = sa.Column(sa.Integer,sa.ForeignKey('LU_ClientApp.pk_id'))
 
-    arch    = relationship('LU_Architecture',foreign_keys=[fk_arch])
-    os      = relationship('LU_OS', foreign_keys=[fk_os])
-    release = relationship('LU_Release', foreign_keys=[fk_release])
-    variant = relationship('LU_Variant', foreign_keys=[fk_variant])
-    country = relationship('LU_Country', foreign_keys=[fk_country])
-    address = relationship('LU_IPAddress', foreign_keys=[fk_address])
-    uuid    = relationship('LU_UUID', foreign_keys=[fk_uuid])
-    client  = relationship('LU_ClientApp', foreign_keys=[fk_client])
-
-    ## FIXME: This is definitely overly complicated and shouldn't need this much to do basic foreign key relations
-    def __init__(self, date, arch, os, release, variant, country, address, uuid, client):
-       if type(date) is datetime:
-          self.date = date
-       else:
-          try:
-             self.date = datetime.strptime(date,"%Y-%m-%d %H:%M:%S")
-          except:
-             self.date = config.DEF
-
-       if type(arch) is LU_Architecture:
-          self.fk_arch = arch.pk_id
-       elif type(arch) is int:
-          self.fk_arch = arch
-       else:
-          self.fk_arch = config.DEF_PK
-
-       if type(os) is LU_OS:
-          self.fk_os = os.pk_id
-       elif type(os) is int:
-          self.fk_os = os
-       else:
-          self.fk_os = config.DEF_PK
-
-       if type(release) is LU_Release:
-          self.fk_release = release.pk_id
-       elif type(release) is int:
-          self.fk_release = release
-       else:
-          self.fk_release = config.DEF_PK
-
-       if type(variant) is LU_Variant:
-          self.fk_variant = variant.pk_id
-       elif type(variant) is int:
-          self.fk_variant = variant
-       else:
-          self.fk_variant = config.DEF_PK
-
-       if type(country) is LU_Country:
-          self.fk_country = country.pk_id
-       elif type(country) is int:
-          self.fk_country = country
-       else:
-          self.fk_country = config.DEF_PK
-
-       if type(address) is LU_IPAddress:
-          self.fk_address = address.pk_id
-       elif type(address) is int:
-          self.fk_address = address
-       else:
-          self.fk_address = config.DEF_PK
-
-       if type(uuid) is LU_UUID:
-          self.fk_uuid = uuid.pk_id
-       elif type(uuid) is int:
-          self.fk_uuid = uuid
-       else:
-          self.fk_uuid = config.DEF_PK
-
-       if type(client) is LU_ClientApp:
-          self.fk_client = client.pk_id
-       elif type(client) is int:
-          self.fk_client = client
-       else:
-          self.fk_client = config.DEF_PK
+    arch    = relationship('LU_Architecture', backref='Events')
+    os      = relationship('LU_OS', backref='Events')
+    release = relationship('LU_Release', backref='Events')
+    variant = relationship('LU_Variant', backref='Events')
+    country = relationship('LU_Country', backref='Events')
+    address = relationship('LU_IPAddress', backref='Events')
+    uuid    = relationship('LU_UUID', backref='Events')
+    client  = relationship('LU_ClientApp', backref='Events')
 
     def __repr__(self):
        return "<Event(pk='%s', date='%s', arch='%s',os='%s', rel='%s', var='%s', country='%s',client='%s',ip='%s',uuid='%s')>" % (

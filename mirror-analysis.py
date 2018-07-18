@@ -167,8 +167,8 @@ def parselog(in_file, use_CSV, out_file, use_SQL, use_geoip):
             sys.exit(-1)
     elif (use_SQL):
         try:
-            session = models.init_db(config.DB_URL,
-                                     config.DB_DEBUG,create=False,
+            session,engine = models.init_db(config.DB_URL,
+                                            config.DB_DEBUG,create=False,
             )
         except Exception, e:
             print "SQL init problem", e
@@ -192,7 +192,7 @@ def parselog(in_file, use_CSV, out_file, use_SQL, use_geoip):
             if (use_CSV):
                 writer.writerow(parsed)
             elif (use_SQL):
-                my_obj = models.add_event( session,
+                my_obj = models.add_event( session, engine,
                                            date    = parsed['Date'],
                                            arch    = parsed['Arch'],
                                            os      = parsed['OS'],

@@ -108,7 +108,7 @@ def initialize_uuid( ss ):
                                        uuid=config.DEF_UUID, 
                                    )
 
-def initialize_events( ss ):
+def initialize_events( ss,engine ):
     date1 = datetime.strptime("1970-01-02 01:00:00", "%Y-%m-%d %H:%M:%S")
     date2 = "1970-01-02 01:00:01"
     date3 = "1970-01-02 01:00:02"
@@ -145,7 +145,7 @@ def initialize_events( ss ):
     uuid2    = config.DEF_UUID
     uuid3    = str(uuid.uuid4())
 
-    my_obj = models.add_event( ss,
+    my_obj = models.add_event( ss, engine,
                                date=date1, 
                                arch=arch1, 
                                os=os1, 
@@ -157,7 +157,7 @@ def initialize_events( ss ):
                                client=client1, 
                             )
 
-    my_obj = models.add_event( ss,
+    my_obj = models.add_event( ss, engine,
                                date=date2, 
                                arch=arch2, 
                                os=os2, 
@@ -169,7 +169,7 @@ def initialize_events( ss ):
                                client=client2, 
                            )
 
-    my_obj = models.add_event( ss,
+    my_obj = models.add_event( ss, engine,
                                date=date3, 
                                arch=arch3, 
                                os=os3, 
@@ -183,7 +183,9 @@ def initialize_events( ss ):
 
 
 if __name__ == '__main__':
-    ss = models.init_db(config.DB_URL,False,create=True)
+    ss,engine = models.init_db(config.DB_URL,
+                               config.DB_DEBUG,
+                               create=True)
     initialize_arch(ss)
     initialize_os(ss)
     initialize_os_release(ss)
@@ -192,5 +194,5 @@ if __name__ == '__main__':
     initialize_clientapps(ss)
     initialize_ipaddress(ss)
     initialize_uuid(ss)
-    initialize_events(ss)
+    initialize_events(ss,engine)
     ss.close()

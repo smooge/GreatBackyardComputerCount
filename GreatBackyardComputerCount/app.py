@@ -54,7 +54,7 @@ def engine():
     reader_country = geoip2.database.Reader(config.GEO_DB_COUNTRY_LOC,
                                             mode=maxminddb.const.MODE_MEMORY
     )
-    session = models.init_db(config.DB_URL,
+    session,engine = models.init_db(config.DB_URL,
                              config.DB_DEBUG,create=False,
     )
 
@@ -125,7 +125,7 @@ def engine():
                         my_client
                     )
 
-        my_obj = models.add_event( session,
+        my_obj = models.add_event( session, engine,
                                    date = my_date,
                                    arch = my_arch,
                                    os   = my_os,
