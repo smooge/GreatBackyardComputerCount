@@ -28,7 +28,7 @@ import geoip2.database   # can't know your places
 import geoip2.errors     # without geoip2
 import maxminddb.const
 import logging           # and to log our errors
-import optparse
+import argparse
 import os
 import re
 import string
@@ -136,7 +136,6 @@ def parse_line(our_line, use_geoip):
                 config.CSV_FIELD[7] : my_arch,
                 config.CSV_FIELD[8] : my_client
             }
-
             return my_data
         else:
             return None
@@ -147,23 +146,13 @@ def parse_line(our_line, use_geoip):
 ## The main worker subroutine
 ## Input: a file which should contain formated data from 
 def parselog(in_file, use_CSV, out_file, use_SQL, use_geoip):
-    in_file = in_file
-    if (use_CSV and out_file):
-        output_file = out_file
-    else:
-        output_file = config.CSV_FILE
 
-    if (use_CSV and use_SQL):
-        # Somethine went bad ehre
-        sys.stderr.write("Both CSV and SQL were set where they shouldnt be\n" % out_file )
-        sys.exit(-1)
-    elif (use_CSV):
+    if (use_CSV):
         try:
-            out_data = open(out_file, 'a')
-            writer = csv.DictWriter(out_data, delimiter=',', quoting=csv.QUOTE_ALL, quotechar='"', fieldnames=config.CSV_FIELD)
+            writer = csv.DictWriter(out_file, delimiter=',', quoting=csv.QUOTE_ALL, quotechar='"', fieldnames=config.CSV_FIELD)
             writer.writeheader()
-        except:
-            sys.stderr.write("Unable to open Output file: %s\n" % out_file )
+        except Exception, e:
+            sys.stderr.write("Error writing output: %s\n" % e )
             sys.exit(-1)
     elif (use_SQL):
         try:
@@ -171,20 +160,10 @@ def parselog(in_file, use_CSV, out_file, use_SQL, use_geoip):
                                             config.DB_DEBUG,create=False,
             )
         except Exception, e:
-            print "SQL init problem", e
+            sys.stderr.write("SQL Init Problem %s\n" % e )
             sys.exit(-1)
-    else:
-        # Somethine went bad ehre
-        sys.stderr.write("Neither CSV or SQL were set where they shouldnt be\n" % out_file )
-        sys.exit(-1)
 
-    try:
-        in_data = open(in_file, "r")
-    except:
-        sys.stderr.write("Unable to open %s\n" % in_file )
-        sys.exit(-1)
-
-    for line in in_data:
+    for line in in_file:
         parsed = parse_line(line,use_geoip)
         if parsed is None:
             pass
@@ -205,12 +184,10 @@ def parselog(in_file, use_CSV, out_file, use_SQL, use_geoip):
                                        )
 
     # Don't Leak data and close our streams.
-    if (use_CSV):
-        out_data.close()
     if (use_SQL):
         session.close()
 
-    in_data.close()
+    in_file.close()
     return
 
 
@@ -219,11 +196,11 @@ def parselog(in_file, use_CSV, out_file, use_SQL, use_geoip):
 ## It will take multiple files and output them to a defined output file
 def main():
     # Define our parser tuple
-    parser = optparse.OptionParser(
+    parser = argparse.ArgumentParser(
         description = "A program to parse Fedora mirrorlist apache common log format files.",
         prog = "mirror-analysis.py",
         version = "1.1.0",
-        usage = "%prog [-CSG] [--CSV ] [--SQL] [--geoip] [-o output-filename] logfile1 [logfile2...]"
+        epilog = "CSV and SQL are mutually exclusive."
     )
     #
     # By default Output to CSV
@@ -234,50 +211,40 @@ def main():
         geoip=False
     )
 
-    parser.add_option("-C", "--CSV",
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-C", "--CSV",
                       action="store_true",
-                      help = "Use csv.  (Mutually exclusive to -S)",
+                      help = "Use csv output file.",
                       dest = "CSV")
-    parser.add_option("-o", "--output",
-                      help = "Sets the name of the output file for the run.",
-                      dest = "output")
-    parser.add_option("-S", "--SQL",
-                      action="store_true",
-                      help = "Sets the name of the database file for the run. (Mutually exclusive to -C)",
-                      dest = "SQL")
-    parser.add_option("-G", "--geoip",
-                      action="store_true",
-                      help = "Says whether to turn on geoip lookups",
-                      dest = "geoip")
+
+    group.add_argument("-S", "--SQL",
+                       action="store_true",
+                       help = "Sets the name of the database file for the run.",
+                       dest = "SQL")
+
+    parser.add_argument("-o", "--output",
+                        help = "Sets the name of the output file for the run.",
+                        dest = "output",
+                        default = config.CSV_FILE,
+                        type =argparse.FileType('a')
+
+)
+    parser.add_argument("-G", "--geoip",
+                        action="store_true",
+                        help = "Says whether to turn on geoip lookups",
+                        dest = "geoip")
+
+    parser.add_argument('files', 
+                        nargs='+', 
+                        type=argparse.FileType('r'))
 
 
     # determine the options
-    (options, args) = parser.parse_args()
-
-    if (options.CSV and options.SQL):
-        print "We can only output CSV or SQL. Only set -C or -S. Do not set both."
-        sys.exit(-1)
-
-    if (not options.CSV and not options.SQL):
-        print "Please set whether to output to CSV or SQL"
-        sys.exit(-1)
-
-    if (not options.CSV and options.output):
-        print "Output file set but CSV not set"
-        sys.exit(-1)
-
-    if (options.CSV and not options.output):
-        options.output = config.CSV_FILE
-
-    if not args:
-        print "We need a file to parse"
-        sys.exit(-1)
-
-
+    args = parser.parse_args()
 
     # loop through the remaining arguments to see if we have files to add.
-    for our_file in args:
-        parselog(our_file,options.CSV,options.output,options.SQL,options.geoip)
+    for our_file in args.files:
+        parselog(our_file,args.CSV,args.output,args.SQL,args.geoip)
 
 if __name__ == '__main__':
     main()

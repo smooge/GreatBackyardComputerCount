@@ -30,13 +30,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError 
 
-
-
 from GreatBackyardComputerCount import config
-
-# sys.path.append('../')
-# import config
-
 
 Base = declarative_base()
 
@@ -96,6 +90,28 @@ def get_one_or_create(session, model, **kwargs):
 
 def add_event(session, engine,
               date, arch, os, release, variant, country, address, uuid, client):
+
+   ## 
+   ## FIXME: This is slow to do large number of events. This is mostly
+   ## due to how I am doing the inserts with each object getting made first
+   ## and then a ORM add at the end. I think what I need is something like
+   ## the following or a complete reworking on how to do bulk inserts.
+   ##
+   ## INSERT INTO Events (date, fk_arch, fk_os, fk_release, fk_variant,
+   ##                     fk_country, fk_address, fk_uuid, fk_client)
+   ## VALUES 
+   ## (date, 
+   ##  (SELECT pk_id from LU_Architecture WHERE name=arch OR name=config.DEF_SQL),
+   ##  (SELECT pk_id from LU_OS WHERE name=os OR name=config.DEF_SQL),
+   ##  (SELECT pk_id from LU_Release WHERE name=release OR name=config.DEF_SQL),
+   ##  (SELECT pk_id from LU_Variant WHERE name=variant OR name=config.DEF_SQL),
+   ##  (SELECT pk_id from LU_Country WHERE name=country OR name=config.DEF_SQL),
+   ##  (SELECT pk_id from LU_UUID WHERE uuid=uuid),
+   ##  (SELECT pk_id from LU_IPAddress WHERE address=address),
+   ##  (SELECT pk_id from LU_ClientApps WHERE name=client OR name=config.DEF_SQL));
+   ##  
+   ##
+
    instance = None
    # Determine if we got a date set up correctly or by string
    if type(date) is not datetime:
@@ -107,30 +123,16 @@ def add_event(session, engine,
          except:
             date = config.DEF_DATE
 
-   # Determine if we got an arch object and if not make one
-   if type(arch) is not LU_Architecture:
-      arch = get_only_one(session,LU_Architecture,name=arch)
-             
-   if type(os) is not LU_OS:
-      os = get_only_one(session,LU_OS,name=os)
-                         
-   if type(release) is not LU_Release:
-      release = get_only_one(session,LU_Release,name=release)
-
-   if type(variant) is not LU_Variant:
-      variant = get_only_one(session,LU_Variant,name=variant)
-      
-   if type(country) is not LU_Country:
-      country = get_only_one(session,LU_Country,name=country)
-
-   if type(address) is not LU_IPAddress:
-      address = get_one_or_create(session,LU_IPAddress,ip_address=address)[0]
-
-   if type(uuid) is not LU_UUID:
-      uuid = get_one_or_create(session,LU_UUID,uuid=uuid)[0]
-
-   if type(client) is not LU_ClientApp:
-      client = get_only_one(session,LU_ClientApp,name=client)
+   # These are lookup tables so we do not want to add if not found
+   arch    = get_only_one(session,LU_Architecture,name=arch)
+   os      = get_only_one(session,LU_OS,name=os)
+   release = get_only_one(session,LU_Release,name=release)
+   variant = get_only_one(session,LU_Variant,name=variant)
+   country = get_only_one(session,LU_Country,name=country)
+   client  = get_only_one(session,LU_ClientApp,name=client)
+   ## These need to insert an ip or uuid if not found
+   address = get_one_or_create(session,LU_IPAddress,ip_address=address)[0]
+   uuid = get_one_or_create(session,LU_UUID,uuid=uuid)[0]
 
    try:
       instance = session.query(Events).filter_by(
@@ -146,6 +148,9 @@ def add_event(session, engine,
       ).one()
    except NoResultFound:
       instance = Events(date=date,arch=arch,os=os, release=release, variant=variant, country=country, address=address, uuid=uuid, client=client)
+      session.add(instance)
+      session.commit()
+
    except MultipleResultsFound:
       instance =  session.query(Events).filter_by(
          date=date,
