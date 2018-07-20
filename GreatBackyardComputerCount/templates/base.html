@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <!-- Tell IE to use its latest mode. Need to put line right after 
+       head or it will not work in some versions. 
+    -->
+  <meta name="description" content="Base HTML for Census Pages">
+  <meta name="robots" content="noindex,nofollow">
+  <!-- Try to make the page responsive to the device -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Links for microformat data -->
+  <link rel="author" href="mailto:smooge@smoogespace.com">
+  <link rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+
+  <!-- Links for style sheets -->
+
+  <!-- Links for JavaScript -->
+
+  <!-- Title of the webpage -->
+  <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+  <header>
+  <h1>Census Data</h1>
+  <h2>{% block subheader %}{% endblock %}</h2>
+  </header>
+  <section>
+  {% block content %}{% endblock %}
+  </section>
+</body>

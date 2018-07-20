@@ -40,6 +40,10 @@ DB_DEBUG=False
 
 GEO_DB_COUNTRY_LOC = basedir + '/GeoIP2/GeoIP2-Country.mmdb'
 
+## Number of queries we default to
+NUMQ = 100
+
+
 # Log files get a lot of weird things stuck in them.. if we see these
 # ignore them..
 CRAP_CHARS = ['/', '$', '!', '#', '%', '&', "'", '"', "(", ")", "*", "+", ",", ":", ";", "<", ">", "=", "?", "@", "[", "^", "|"]

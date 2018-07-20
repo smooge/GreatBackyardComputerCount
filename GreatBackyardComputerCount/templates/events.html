@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Last {{ count }} Events{% endblock %}
+
+{% block subheader %}Known {{ count }} Events{% endblock %}
+{% block content %}
+<table border=1>
+<tr>
+  <th>Date</th>
+  <th>Architecture</th>
+  <th>OS</th>
+  <th>Release</th>
+  <th>Variant</th>
+  <th>Country</th>
+  <th>Address</th>
+  <th>UUID</th>
+  <th>ClientApp</th>
+</tr>
+  {% for entry in events %}
+<tr>
+  <td>{{ entry.date }}</td>
+  <td>{{ entry.arch.name }}</td>
+  <td>{{ entry.os.name }}</td>
+  <td>{{ entry.release.name }}</td>
+  <td>{{ entry.variant.name }}</td>
+  <td>{{ entry.country.name }}</td>
+  <td>{{ entry.address.ip_address }}</td>
+  <td>{{ entry.uuid.uuid }}</td>
+  <td>{{ entry.client.name }}</td>
+</tr>
+  {% endfor %}
+</table>
+{% endblock %}

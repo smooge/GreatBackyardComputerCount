@@ -32,35 +32,33 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from GreatBackyardComputerCount import config
 
-Base = declarative_base()
+engine = sa.create_engine(config.DB_URL, echo=config.DB_DEBUG)
+# Source: https://docs.sqlalchemy.org/en/latest/dialects/sqlite.html
+# see section 'sqlite-foreign-keys'
+if config.DB_URL.startswith('sqlite:'):
+   def _fk_pragma_on_connect(dbapi_con, con_record):
+      dbapi_con.execute("PRAGMA foreign_keys=ON")
+      sa.event.listen(engine, 'connect', _fk_pragma_on_connect)
 
-def init_db( db_url, db_debug=False, create=False):
+session = scoped_session(sessionmaker(bind=engine))
+session.configure(bind=engine, 
+                        autoflush=False,
+                        expire_on_commit=False)
+Base = declarative_base()
+Base.query = session.query_property()
+
+def init_db():
    """
    A tool to set up the database
    """
+   Base.metadata.create_all(bind=engine)
 
-   db_engine = sa.create_engine(db_url, echo=db_debug)
-   if create:
-      Base.metadata.create_all(bind=db_engine)
-
-   # Source: https://docs.sqlalchemy.org/en/latest/dialects/sqlite.html
-   # see section 'sqlite-foreign-keys'
-   if db_url.startswith('sqlite:'):
-      def _fk_pragma_on_connect(dbapi_con, con_record):
-         dbapi_con.execute("PRAGMA foreign_keys=ON")
-         sa.event.listen(db_engine, 'connect', _fk_pragma_on_connect)
-
-   db_session = scoped_session(sessionmaker(bind=db_engine))
-   db_session.configure(bind=db_engine, autoflush=False, expire_on_commit=False)
-   db_session.commit()
-
-   return db_session,db_engine
 
 ##
 ## Source https://stackoverflow.com/questions/2546207/does-sqlalchemy-have-an-equivalent-of-djangos-get-or-create
 ## http://skien.cc/blog/2014/01/15/sqlalchemy-and-race-conditions-implementing/
 ## Credit: Patrick Uiterwijk for mentioning it.
-def get_one_or_create(session, model, **kwargs):
+def get_one_or_create(model, **kwargs):
    """
    A utility to check to see if an entry exists. If it does not add
    it to the database.
@@ -70,7 +68,7 @@ def get_one_or_create(session, model, **kwargs):
    created = False
 
    try:
-      instance = session.query(model).filter_by(**kwargs).one()
+      instance = model.query.filter_by(**kwargs).one()
    except NoResultFound:
       kwargs.update({})
       try:
@@ -81,15 +79,14 @@ def get_one_or_create(session, model, **kwargs):
       except IntegrityError:
          session.rollback()
          try:
-            instance = session.query(model).filter_by(**kwargs).one()
+            instance = model.query.filter_by(**kwargs).one()
          except NoResultFound: 
             instance = None
    except MultipleResultsFound:
-      instance =session.query(model).filter_by(**kwargs).first()
+      instance = model.query.filter_by(**kwargs).first()
    return (instance, created)
 
-def add_event(session, engine,
-              date, arch, os, release, variant, country, address, uuid, client):
+def add_event(date, arch, os, release, variant, country, address, uuid, client):
 
    ## 
    ## FIXME: This is slow to do large number of events. This is mostly
@@ -124,18 +121,18 @@ def add_event(session, engine,
             date = config.DEF_DATE
 
    # These are lookup tables so we do not want to add if not found
-   arch    = get_only_one(session,LU_Architecture,name=arch)
-   os      = get_only_one(session,LU_OS,name=os)
-   release = get_only_one(session,LU_Release,name=release)
-   variant = get_only_one(session,LU_Variant,name=variant)
-   country = get_only_one(session,LU_Country,name=country)
-   client  = get_only_one(session,LU_ClientApp,name=client)
+   arch    = get_only_one(LU_Architecture,name=arch)
+   os      = get_only_one(LU_OS,name=os)
+   release = get_only_one(LU_Release,name=release)
+   variant = get_only_one(LU_Variant,name=variant)
+   country = get_only_one(LU_Country,name=country)
+   client  = get_only_one(LU_ClientApp,name=client)
    ## These need to insert an ip or uuid if not found
-   address = get_one_or_create(session,LU_IPAddress,ip_address=address)[0]
-   uuid = get_one_or_create(session,LU_UUID,uuid=uuid)[0]
+   address = get_one_or_create(LU_IPAddress,ip_address=address)[0]
+   uuid = get_one_or_create(LU_UUID,uuid=uuid)[0]
 
    try:
-      instance = session.query(Events).filter_by(
+      instance = Events.query.filter_by(
          date=date,
          arch=arch,
          os=os,
@@ -152,7 +149,7 @@ def add_event(session, engine,
       session.commit()
 
    except MultipleResultsFound:
-      instance =  session.query(Events).filter_by(
+      instance =  Events.query.filter_by(
          date=date,
          arch=arch,
          os=os,
@@ -169,7 +166,7 @@ def add_event(session, engine,
 
 ##
 ##
-def get_only_one(session, model, **kwargs):
+def get_only_one(model, **kwargs):
    """
 
    A utility to check to see if an entry exists. If it does not return the default.
@@ -177,11 +174,11 @@ def get_only_one(session, model, **kwargs):
    """
    instance = None
    try:
-      instance = session.query(model).filter_by(**kwargs).one()
+      instance = model.query.filter_by(**kwargs).one()
    except NoResultFound:
-      instance = session.query(model).first()
+      instance = model.query.first()
    except MultipleResultsFound:
-      instance =session.query(model).filter_by(**kwargs).first()
+      instance = model.query.filter_by(**kwargs).first()
    return instance
 
 ## Lookup Table for Architectures

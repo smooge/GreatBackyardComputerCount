@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Known ClientApps{% endblock %}
+
+{% block subheader %}Known ClientApps{% endblock %}
+{% block content %}
+<table border=1>
+<tr>
+  <th>Short Name</th>
+</tr>
+  {% for entry in clientapps %}
+<tr>
+  <td>{{ entry.name }}</td>
+</tr>
+  {% endfor %}
+</table>
+{% endblock %}

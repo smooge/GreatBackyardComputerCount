@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Last {{ count }} IP Addresses{% endblock %}
+
+{% block subheader %}Known {{ count }} IP Addresses{% endblock %}
+{% block content %}
+<table border=1>
+<tr>
+  <th>UUID</th>
+</tr>
+  {% for entry in addresses %}
+<tr>
+  <td>{{ entry.ip_address }}</td>
+</tr>
+  {% endfor %}
+</table>
+{% endblock %}

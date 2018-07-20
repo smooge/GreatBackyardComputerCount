@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Last {{ count }} UUIDs{% endblock %}
+
+{% block subheader %}Known {{ count }} UUIDs{% endblock %}
+{% block content %}
+<table border=1>
+<tr>
+  <th>UUID</th>
+</tr>
+  {% for entry in uuids %}
+<tr>
+  <td>{{ entry.uuid }}</td>
+</tr>
+  {% endfor %}
+</table>
+{% endblock %}

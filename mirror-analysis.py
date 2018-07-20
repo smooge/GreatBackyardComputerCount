@@ -154,14 +154,6 @@ def parselog(in_file, use_CSV, out_file, use_SQL, use_geoip):
         except Exception, e:
             sys.stderr.write("Error writing output: %s\n" % e )
             sys.exit(-1)
-    elif (use_SQL):
-        try:
-            session,engine = models.init_db(config.DB_URL,
-                                            config.DB_DEBUG,create=False,
-            )
-        except Exception, e:
-            sys.stderr.write("SQL Init Problem %s\n" % e )
-            sys.exit(-1)
 
     for line in in_file:
         parsed = parse_line(line,use_geoip)
@@ -171,7 +163,7 @@ def parselog(in_file, use_CSV, out_file, use_SQL, use_geoip):
             if (use_CSV):
                 writer.writerow(parsed)
             elif (use_SQL):
-                my_obj = models.add_event( session, engine,
+                my_obj = models.add_event( 
                                            date    = parsed['Date'],
                                            arch    = parsed['Arch'],
                                            os      = parsed['OS'],
@@ -185,7 +177,7 @@ def parselog(in_file, use_CSV, out_file, use_SQL, use_geoip):
 
     # Don't Leak data and close our streams.
     if (use_SQL):
-        session.close()
+        models.session.close()
 
     in_file.close()
     return

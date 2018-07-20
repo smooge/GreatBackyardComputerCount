@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Known Countries{% endblock %}
+
+{% block subheader %}Known Countries{% endblock %}
+{% block content %}
+<table border=1>
+<tr>
+  <th>Short Name</th>
+  <th>Long Name</th>
+</tr>
+  {% for entry in countries %}
+<tr>
+  <td>{{ entry.name }}</td>
+  <td>{{ entry.long_name }}</td>
+</tr>
+  {% endfor %}
+</table>
+{% endblock %}

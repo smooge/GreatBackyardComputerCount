@@ -34,31 +34,30 @@ import uuid
 from GreatBackyardComputerCount import config
 from GreatBackyardComputerCount.db import models
 
-def initialize_arch( ss ):
+def initialize_arch( ):
     with open('./initial_data/architectures.csv', 'r') as csvfile:
         my_reader = csv.reader(csvfile, delimiter=',', quotechar='"')
         for row in my_reader:
-            my_obj = models.get_one_or_create( ss, 
-                                               models.LU_Architecture, 
+            my_obj = models.get_one_or_create( models.LU_Architecture, 
                                                name=row[0], 
                                                long_name=row[1], 
                                                description=row[2])
 
-def initialize_os( ss ):
+def initialize_os( ):
     with open('./initial_data/operating_systems.csv', 'r') as csvfile:
         my_reader = csv.reader(csvfile, delimiter=',', quotechar='"')
         for row in my_reader:
-            my_obj = models.get_one_or_create( ss, 
+            my_obj = models.get_one_or_create(
                                                models.LU_OS, 
                                                name=row[0], 
                                                long_name=row[1], 
                                                description=row[2])
         
-def initialize_os_release( ss ):
+def initialize_os_release( ):
     with open('./initial_data/os_releases.csv', 'r') as csvfile:
         my_reader = csv.reader(csvfile, delimiter=',', quotechar='"')
         for row in my_reader:
-            my_obj = models.get_one_or_create( ss, 
+            my_obj = models.get_one_or_create( 
                                                models.LU_Release, 
                                                name=row[0], 
                                                long_name=row[1], 
@@ -67,43 +66,43 @@ def initialize_os_release( ss ):
                                                eol_date=row[4],
             )
 
-def initialize_os_variant( ss ):
+def initialize_os_variant( ):
     with open('./initial_data/os_variants.csv', 'r') as csvfile:
         my_reader = csv.reader(csvfile, delimiter=',', quotechar='"')
         for row in my_reader:
-            my_obj = models.get_one_or_create( ss, 
+            my_obj = models.get_one_or_create(
                                                models.LU_Variant, 
                                                name=row[0], 
                                                description=row[1],
             )
     
-def initialize_country( ss ):
+def initialize_country( ):
     with open('./initial_data/countries.csv', 'r') as csvfile:
         my_reader = csv.reader(csvfile, delimiter=',', quotechar='"')
         for row in my_reader:
-            my_obj = models.get_one_or_create( ss, 
+            my_obj = models.get_one_or_create( 
                                                models.LU_Country, 
                                                name=row[0], 
                                                long_name=row[1], 
             )
 
-def initialize_clientapps( ss ):
+def initialize_clientapps( ):
     with open('./initial_data/clientapps.csv', 'r') as csvfile:
         my_reader = csv.reader(csvfile, delimiter=',', quotechar='"')
         for row in my_reader:
-            my_obj = models.get_one_or_create( ss, 
+            my_obj = models.get_one_or_create( 
                                                models.LU_ClientApp, 
                                                name=row[0], 
             )
 
-def initialize_ipaddress( ss ):
-    my_obj = models.get_one_or_create( ss, 
+def initialize_ipaddress( ):
+    my_obj = models.get_one_or_create( 
                                        models.LU_IPAddress, 
                                        ip_address=config.DEF_IP, 
                                    )
 
-def initialize_uuid( ss ):
-    my_obj = models.get_one_or_create( ss, 
+def initialize_uuid( ):
+    my_obj = models.get_one_or_create( 
                                        models.LU_UUID, 
                                        uuid=config.DEF_UUID, 
                                    )
@@ -113,39 +112,39 @@ def initialize_events( ss,engine ):
     date2 = "1970-01-02 01:00:01"
     date3 = "1970-01-02 01:00:02"
 
-    arch1    = ss.query(models.LU_Architecture).filter_by(name=config.DEF_ARCH).first()
+    arch1    = models.LU_Architecture.query.filter_by(name=config.DEF_ARCH).first().name
     arch2    = config.DEF_ARCH
     arch3    = 'x86_64'
     
-    os1      = ss.query(models.LU_OS).filter_by(name=config.DEF_OS).first()
+    os1      = models.LU_OS.query.filter_by(name=config.DEF_OS).first().name
     os2      = config.DEF_OS
     os3      = 'EL'
 
-    release1 = ss.query(models.LU_Release).filter_by(name=config.DEF_RELEASE).first()
+    release1 = ss.query(models.LU_Release).filter_by(name=config.DEF_RELEASE).first().name
     release2 = config.DEF_RELEASE
     release3 = 'EL07'
 
-    variant1 = ss.query(models.LU_Variant).filter_by(name=config.DEF_VARIANT).first()
+    variant1 = ss.query(models.LU_Variant).filter_by(name=config.DEF_VARIANT).first().name
     variant2 = config.DEF_RELEASE
     variant3 = 'workstation'
 
-    country1 = ss.query(models.LU_Country).filter_by(name=config.DEF_COUNTRY).first()
+    country1 = ss.query(models.LU_Country).filter_by(name=config.DEF_COUNTRY).first().name
     country2 = config.DEF_RELEASE
     country3 = 'US'
 
-    client1  = ss.query(models.LU_ClientApp).filter_by(name=config.DEF_CLIENT).first()
+    client1  = ss.query(models.LU_ClientApp).filter_by(name=config.DEF_CLIENT).first().name
     client2  = config.DEF_CLIENT
     client3  = 'yum'
 
-    ip1      = ss.query(models.LU_IPAddress).filter_by(ip_address=config.DEF_IP).first()
+    ip1      = ss.query(models.LU_IPAddress).filter_by(ip_address=config.DEF_IP).first().ip_address
     ip2      = config.DEF_IP
     ip3      = '127.0.0.1'
 
-    uuid1    = ss.query(models.LU_UUID).filter_by(uuid=config.DEF_UUID).first()
+    uuid1    = ss.query(models.LU_UUID).filter_by(uuid=config.DEF_UUID).first().uuid
     uuid2    = config.DEF_UUID
     uuid3    = str(uuid.uuid4())
 
-    my_obj = models.add_event( ss, engine,
+    my_obj = models.add_event( 
                                date=date1, 
                                arch=arch1, 
                                os=os1, 
@@ -157,7 +156,7 @@ def initialize_events( ss,engine ):
                                client=client1, 
                             )
 
-    my_obj = models.add_event( ss, engine,
+    my_obj = models.add_event( 
                                date=date2, 
                                arch=arch2, 
                                os=os2, 
@@ -169,7 +168,7 @@ def initialize_events( ss,engine ):
                                client=client2, 
                            )
 
-    my_obj = models.add_event( ss, engine,
+    my_obj = models.add_event( 
                                date=date3, 
                                arch=arch3, 
                                os=os3, 
@@ -183,16 +182,17 @@ def initialize_events( ss,engine ):
 
 
 if __name__ == '__main__':
-    ss,engine = models.init_db(config.DB_URL,
-                               config.DB_DEBUG,
-                               create=True)
-    initialize_arch(ss)
-    initialize_os(ss)
-    initialize_os_release(ss)
-    initialize_os_variant(ss)
-    initialize_country(ss)
-    initialize_clientapps(ss)
-    initialize_ipaddress(ss)
-    initialize_uuid(ss)
+    ss = models.session
+    engine = models.engine
+
+    models.init_db()
+    initialize_arch()
+    initialize_os()
+    initialize_os_release()
+    initialize_os_variant()
+    initialize_country()
+    initialize_clientapps()
+    initialize_ipaddress()
+    initialize_uuid()
     initialize_events(ss,engine)
     ss.close()
