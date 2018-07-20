@@ -43,6 +43,29 @@ GEO_DB_COUNTRY_LOC = basedir + '/GeoIP2/GeoIP2-Country.mmdb'
 ## Number of queries we default to
 NUMQ = 100
 
+##
+## Our one mirror.
+MIRROR_LIST="""
+http://www.smoogespace.com/downloads/census/
+"""
+
+## Default file for CSV writing
+CSV_FILE = basedir + '/GBCC.csv'
+
+##
+## The logfile 
+LOGFILE= basedir+ '/GBCC_server.log'
+
+#
+# This needs to be set to which logs we are looking at
+MIRRORS='fedora'
+#MIRRORS='centos'
+
+
+##
+## FIXME: The following are all more constants for programs to use. They
+## should probably be moved to a different file
+##
 
 # Log files get a lot of weird things stuck in them.. if we see these
 # ignore them..
@@ -50,14 +73,9 @@ CRAP_CHARS = ['/', '$', '!', '#', '%', '&', "'", '"', "(", ")", "*", "+", ",", "
 
 
 ##
-## Our one mirror.
-MIRROR_LIST="""
-http://www.smoogespace.com/downloads/census/
-"""
-
+## FIXME: This is all in the sql database. Should we just pull the data out
+## of a SQL DB at startup even if we are running in CVS mode?
 ##
-## The logfile 
-LOGFILE= basedir+ '/GBCC_server.log'
 
 KNOWN_VARIANTS={
     'unknown':'unknown',
@@ -196,15 +214,9 @@ DEF_UUID = 'ffffffff-ffff-4fff-bfff-ffffffffffff'
 DEF_CLIENT = DEF_SQL
 DEF_REPO = DEF_SQL
 
-#
-# This needs to be set to which logs we are looking at
-MIRRORS='fedora'
-#MIRRORS='centos'
-
 # We do not define the CSV_FILE here as it should be an argument of
 # the calling analysis program.
 #
-CSV_FILE = basedir + '/mirrors-analysis.csv'
 
 CSV_FIELD = [
     "Date", 
@@ -234,12 +246,6 @@ KNOWN_OSES={
     'el':'el',
     'coreos':'coreos',
 }
-
-FEDORA_RELEASES= [3,40]
-EL_RELEAES= [5,8]
-CORE_RELEASES= [0,40]
-
-
 
 # Arches taken from what systems have replied in logs
 KNOWN_ARCHES = {

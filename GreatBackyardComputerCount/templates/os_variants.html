@@ -8,11 +8,14 @@
 <tr>
   <th>Short Name</th>
   <th>Description</th>
+  <th>Count</th>
 </tr>
   {% for entry in variants %}
 <tr>
-  <td>{{ entry.name }}</td>
-  <td>{{ entry.description }}</td>
+  <td>{{ entry['name'] }}</td>
+  <td>{{ entry['description'] }}</td>
+  <td>{{ entry['description'] }}</td>
+  <td>{{ entry['count'] }}</td>
 </tr>
   {% endfor %}
 </table>

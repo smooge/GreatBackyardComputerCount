@@ -9,12 +9,14 @@
   <th>Short Name</th>
   <th>Long Name</th>
   <th>Description</th>
+  <th>Number Seen</th>
 </tr>
   {% for entry in oses %}
 <tr>
-  <td>{{ entry.name }}</td>
-  <td>{{ entry.long_name }}</td>
-  <td>{{ entry.description }}</td>
+  <td>{{ entry['name'] }}</td>
+  <td>{{ entry['long_name'] }}</td>
+  <td>{{ entry['description'] }}</td>
+  <td>{{ entry['count'] }}</td>
 </tr>
   {% endfor %}
 </table>

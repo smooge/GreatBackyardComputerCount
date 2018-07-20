@@ -6,11 +6,13 @@
 {% block content %}
 <table border=1>
 <tr>
-  <th>UUID</th>
+  <th>IP Address</th>
+  <th>Count</th>
 </tr>
   {% for entry in addresses %}
 <tr>
-  <td>{{ entry.ip_address }}</td>
+  <td>{{ entry['ip_address'] }}</td>
+  <td>{{ entry['count'] }}</td>
 </tr>
   {% endfor %}
 </table>

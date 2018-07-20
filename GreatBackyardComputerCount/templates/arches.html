@@ -9,12 +9,14 @@
   <th>Short Name</th>
   <th>Long Name</th>
   <th>Description</th>
+  <th>Number In DB</th>
 </tr>
   {% for entry in arches %}
 <tr>
-  <td>{{ entry.name }}</td>
-  <td>{{ entry.long_name }}</td>
-  <td>{{ entry.description }}</td>
+  <td align="center">{{ entry['name'] }}</td>
+  <td align="center">{{ entry['long_name'] }}</td>
+  <td align="center">{{ entry['description'] }}</td>
+  <td align="right">{{ entry['count'] }}</td>
 </tr>
   {% endfor %}
 </table>

@@ -6,11 +6,13 @@
 {% block content %}
 <table border=1>
 <tr>
-  <th>Short Name</th>
+  <th>Name</th>
+  <th>Number in DB</th>
 </tr>
   {% for entry in clientapps %}
 <tr>
-  <td>{{ entry.name }}</td>
+  <td align="center">{{ entry['name'] }}</td>
+  <td align="right">{{ entry['count'] }}</td>
 </tr>
   {% endfor %}
 </table>

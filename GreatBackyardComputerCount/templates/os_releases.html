@@ -11,14 +11,17 @@
   <th>Description</th>
   <th>Release Date</th>
   <th>EOL Date</th>
+  <th>Count</th>
 </tr>
   {% for entry in releases %}
 <tr>
-  <td>{{ entry.name }}</td>
-  <td>{{ entry.long_name }}</td>
-  <td>{{ entry.description }}</td>
-  <td>{{ entry.release_date }}</td>
-  <td>{{ entry.eol_date }}</td>
+  <td>{{ entry['name'] }}</td>
+  <td>{{ entry['long_name'] }}</td>
+  <td>{{ entry['description'] }}</td>
+  <td>{{ entry['release_date'] }}</td>
+  <td>{{ entry['eol_date'] }}</td>
+  <td>{{ entry['count'] }}</td>
+  
 </tr>
   {% endfor %}
 </table>

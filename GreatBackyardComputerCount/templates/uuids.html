@@ -7,10 +7,12 @@
 <table border=1>
 <tr>
   <th>UUID</th>
+  <th>Count</th>
 </tr>
   {% for entry in uuids %}
 <tr>
-  <td>{{ entry.uuid }}</td>
+  <td>{{ entry['uuid'] }}</td>
+  <td>{{ entry['count'] }}</td>
 </tr>
   {% endfor %}
 </table>
