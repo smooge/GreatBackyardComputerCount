@@ -234,7 +234,7 @@ class LU_OS(Base):
     __tablename__ = 'LU_OS'
     pk_id = sa.Column(sa.Integer, primary_key=True, nullable=False)
     name = sa.Column(sa.String(20), unique=True, nullable=False)
-    long_name = sa.Column(sa.String(80),  nullable=False)
+    long_name = sa.Column(sa.String(80), nullable=False)
     description = sa.Column(sa.String(1024), nullable=True)
 
     def __repr__(self):
@@ -264,7 +264,7 @@ class LU_Release(Base):
     __tablename__ = 'LU_Release'
     pk_id = sa.Column(sa.Integer, primary_key=True, nullable=False)
     name = sa.Column(sa.String(20), unique=True, nullable=False)
-    long_name = sa.Column(sa.String(80),  nullable=False)
+    long_name = sa.Column(sa.String(80), nullable=False)
     description = sa.Column(sa.String(1024), nullable=True)
     release_date = sa.Column(sa.DateTime, nullable=True)
     eol_date = sa.Column(sa.DateTime, nullable=True)

@@ -30,7 +30,6 @@ from uuid import UUID
 from datetime import datetime
 
 import config
-from db import models
 
 
 def clean_request(temp_answer):
@@ -42,12 +41,12 @@ def clean_request(temp_answer):
     sanitize = spew.lower()
     return sanitize
 
-#
-# A routine which takes the date from apache format to a datetime
-# format 
 
 def determine_apache_date(givendate):
-    # strptime doesn't understand timezones so we have to 
+    #
+    # A routine which takes the date from apache format to a
+    # datetime format
+    # strptime doesn't understand timezones so we have to
     # remove it from the string
     date_subpart = givendate.split()
     try:
@@ -56,8 +55,9 @@ def determine_apache_date(givendate):
         date = config.DEF_DATE
     return date
 
-# This is similar to the repos but has a lot less garbage normally
+
 def determine_arch(asked_arch):
+    # This is similar to the repos but has a lot less garbage normally
     # Set up a default answer
     arch = config.DEF_ARCH
     if asked_arch is None:
@@ -66,6 +66,7 @@ def determine_arch(asked_arch):
     if sanitized in config.KNOWN_ARCHES.keys():
         arch = config.KNOWN_ARCHES[sanitized]
     return arch
+
 
 def determine_os(asked_os):
     os = config.DEF_OS
@@ -76,8 +77,9 @@ def determine_os(asked_os):
         os = config.KNOWN_OS[sanitized]
     return os
 
-## Determine release
+
 def determine_release(asked_rel):
+    # Determine release
     release = config.DEF_RELEASE
     if asked_rel is None:
         return release
@@ -86,9 +88,10 @@ def determine_release(asked_rel):
         release = config.KNOWN_RELEASES[sanitized]
     return release
 
+
 def determine_repo(asked_repo, regex):
     if asked_repo is None:
-        return (config.DEF_OS,config.DEF_RELEASE)
+        return (config.DEF_OS, config.DEF_RELEASE)
 
     # start the process of cleaning out various weirdness clients have
     spew = clean_request(asked_repo)
@@ -112,11 +115,11 @@ def determine_repo(asked_repo, regex):
     if sanitize in config.REPO_KEYS:
         return config.REPO_NAMES[sanitize]
     else:
-        return (config.DEF_OS,config.DEF_RELEASE)
+        return (config.DEF_OS, config.DEF_RELEASE)
 
 
-## Determine variants
 def determine_variant(asked_variant):
+    # Determine variants
     variant = config.DEF_VARIANT
     if asked_variant is None:
         return variant
@@ -125,9 +128,10 @@ def determine_variant(asked_variant):
     if sanitized in config.KNOWN_VARIANTS.keys():
         variant = config.KNOWN_VARIANTS[sanitized]
     return variant
-    
-# based off of https://gist.github.com/ShawnMilo/7777304
+
+
 def determine_uuid(asked_uuid):
+    # based off of https://gist.github.com/ShawnMilo/7777304
     uuid = config.DEF_UUID
 
     if asked_uuid is None:
@@ -145,8 +149,9 @@ def determine_uuid(asked_uuid):
     else:
         return uuid
 
-# Determine if client user agent is known
+
 def determine_client(asked_client):
+    # Determine if client user agent is known
     client = config.DEF_CLIENT
     if asked_client is None:
         return client
@@ -155,8 +160,8 @@ def determine_client(asked_client):
     except:
         return config.DEF_CLIENT
 
-    for key,value in config.KNOWN_CLIENTS.iteritems():
+    for key, value in config.KNOWN_CLIENTS.iteritems():
         if key in asked_client:
             return value
     return config.DEF_CLIENT
-
+#

@@ -31,7 +31,7 @@ from datetime import datetime
 # TODO have setup do this.
 basedir = '/home/smooge'
 
-DB_URL = 'sqlite:///'+basedir+'/GBCC.db'
+DB_URL = 'sqlite:///' + basedir + '/GBCC.db'
 DB_DEBUG = False
 
 
@@ -320,7 +320,7 @@ FEDORA_REPOS = {
     "epel8": ("el", "el08"),
     "rawhide": ("fedora", "frawhide"),
     "frawhide": ("fedora", "frawhide"),
-    "rawhidemodular":  ("fed_mod", "frawhide"),
+    "rawhidemodular": ("fed_mod", "frawhide"),
     "f03": ("fedora", "f03"),
     "f04": ("fedora", "f04"),
     "f05": ("fedora", "f05"),

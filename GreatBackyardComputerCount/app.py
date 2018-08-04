@@ -27,28 +27,14 @@ mirrors that can be used to get the current repodata for the server.
 
 """
 
-import geoip2.database   # can't know your places 
-import geoip2.errors     # without geoip2
-import maxminddb.const
-import logging           # and to log our errors
-import logging.handlers
-
 import flask
 
 # local config
-from . import config
-from . import common
 from . import blueprints
+
 
 def engine():
     app = flask.Flask(__name__)
-
-    ##
-    ## FIXME (doing country look ups slows down the processing of log files
-    ## by 10.)
-    reader_country = geoip2.database.Reader(config.GEO_DB_COUNTRY_LOC,
-                                            mode=maxminddb.const.MODE_MEMORY
-    )
 
     app.logger.addHandler
 
