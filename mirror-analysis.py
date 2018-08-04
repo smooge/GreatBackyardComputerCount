@@ -21,20 +21,15 @@
 # of the Common Cure Rights Commitment.
 
 
-import csv               # this is a temp to write out logs. 
-                         # replace with alchemy
+import csv      # this is a temp to write out logs.
 import errno
-import geoip2.database   # can't know your places 
+import geoip2.database   # can't know your places
 import geoip2.errors     # without geoip2
 import maxminddb.const
-import logging           # and to log our errors
+# import logging           # and to log our errors
 import argparse
-import os
 import re
-import string
 import sys
-
-from uuid import UUID
 
 from GreatBackyardComputerCount import config
 from GreatBackyardComputerCount import common
@@ -44,31 +39,29 @@ repo_keys = config.REPO_KEYS
 
 pattern = re.compile("".join(config.REPO_LOGFMT))
 
-## These are global readers for the application
-## FIXME (make it non global)
-## FIXME (doing country look ups slows down the processing of log files by
-##        10.)
+# These are global readers for the application
+# FIXME (make it non global)
+# FIXME (doing country look ups slows down the processing of log files by
+#        10.)
 
 try:
     reader_country = geoip2.database.Reader(config.GEO_DB_COUNTRY_LOC,
-                                            mode=maxminddb.const.MODE_MEMORY
-    )
+                                            mode=maxminddb.const.MODE_MEMORY)
 except:
     sys.exit(errno.EACCES)
 
-
-##
-## Start our subroutines here
+#
+# Start our subroutines here
 
 
 #
 # A subroutine to try to determine our get data (field 7 of normal apache log)
 #
 def parse_request(request):
-    repo=config.DEF_REPO
-    arch=config.DEF_ARCH
-    uuid=config.DEF_UUID
-    variant=config.DEF_VARIANT
+    repo = config.DEF_REPO
+    arch = config.DEF_ARCH
+    uuid = config.DEF_UUID
+    variant = config.DEF_VARIANT
     parts = request.split()[1].split("?")[1].split("&")
     for i in parts:
         if 'repo=' in i:
@@ -79,25 +72,23 @@ def parse_request(request):
             uuid = i.split('=')[1]
         if 'variant=' in i:
             variant = i.split('=')[1]
-    return (repo,arch,uuid,variant)
 
-#
-# Parse the log line
-#
+    return (repo, arch, uuid, variant)
+
+
 def parse_line(our_line, use_geoip):
-
-    ##
-    ## Figure out if line is something we want to work on more
+    #
+    # Figure out if line is something we want to work on more
     global pattern
 
-    my_ip      = config.DEF_IP
+    my_ip = config.DEF_IP
     my_country = config.DEF_COUNTRY
-    my_uuid    = config.DEF_UUID
-    my_os      = config.DEF_OS
+    my_uuid = config.DEF_UUID
+    my_os = config.DEF_OS
     my_variant = config.DEF_VARIANT
     my_release = config.DEF_RELEASE
-    my_arch    = config.DEF_ARCH
-    my_client  = config.DEF_CLIENT
+    my_arch = config.DEF_ARCH
+    my_client = config.DEF_CLIENT
     if (('/metalink' in our_line) or ('/mirrorlist' in our_line)):
         our_blob = pattern.match(our_line)
         if our_blob:
@@ -106,19 +97,19 @@ def parse_line(our_line, use_geoip):
                 return None
             if ('repo=' not in our_dict['request']):
                 return None
-            my_ip             = our_dict['host']
-            my_time           = common.determine_apache_date(our_dict['time']) 
-            r,a,u,v           = parse_request(our_dict['request'])
-            my_os,my_release  = common.determine_repo(r,re)
-            my_arch     = common.determine_arch(a)
-            my_uuid     = common.determine_uuid(u)
-            my_variant  = common.determine_variant(v)
-            my_client   = common.determine_client(our_dict['user_agent'])
+            my_ip = our_dict['host']
+            my_time = common.determine_apache_date(our_dict['time'])
+            r, a, u, v = parse_request(our_dict['request'])
+            my_os, my_release = common.determine_repo(r, re)
+            my_arch = common.determine_arch(a)
+            my_uuid = common.determine_uuid(u)
+            my_variant = common.determine_variant(v)
+            my_client = common.determine_client(our_dict['user_agent'])
 
-            ## Figure out where in the world we think we are.
+            # Figure out where in the world we think we are.
             if (use_geoip):
                 try:
-                    response   = reader_country.country(my_ip)
+                    response = reader_country.country(my_ip)
                     my_country = response.country.iso_code
                 except:
                     my_country = config.DEF_COUNTRY
@@ -126,15 +117,15 @@ def parse_line(our_line, use_geoip):
                 my_country = config.DEF_COUNTRY
 
             my_data = {
-                config.CSV_FIELD[0] : my_time,
-                config.CSV_FIELD[1] : my_ip,
-                config.CSV_FIELD[2] : my_country,
-                config.CSV_FIELD[3] : my_uuid,
-                config.CSV_FIELD[4] : my_os,
-                config.CSV_FIELD[5] : my_variant,
-                config.CSV_FIELD[6] : my_release,
-                config.CSV_FIELD[7] : my_arch,
-                config.CSV_FIELD[8] : my_client
+                config.CSV_FIELD[0]: my_time,
+                config.CSV_FIELD[1]: my_ip,
+                config.CSV_FIELD[2]: my_country,
+                config.CSV_FIELD[3]: my_uuid,
+                config.CSV_FIELD[4]: my_os,
+                config.CSV_FIELD[5]: my_variant,
+                config.CSV_FIELD[6]: my_release,
+                config.CSV_FIELD[7]: my_arch,
+                config.CSV_FIELD[8]: my_client
             }
             return my_data
         else:
@@ -142,38 +133,43 @@ def parse_line(our_line, use_geoip):
     else:
         return None
 
-##
-## The main worker subroutine
-## Input: a file which should contain formated data from 
-def parselog(in_file, use_CSV, out_file, use_SQL, use_geoip):
 
+def parselog(in_file, use_CSV, out_file, use_SQL, use_geoip):
+    #
+    # The main worker subroutine
+    # Input: a file which should contain formated data from
     if (use_CSV):
         try:
-            writer = csv.DictWriter(out_file, delimiter=',', quoting=csv.QUOTE_ALL, quotechar='"', fieldnames=config.CSV_FIELD)
+            writer = csv.DictWriter(
+                out_file,
+                delimiter=',',
+                quoting=csv.QUOTE_ALL,
+                quotechar='"',
+                fieldnames=config.CSV_FIELD)
             writer.writeheader()
         except Exception, e:
-            sys.stderr.write("Error writing output: %s\n" % e )
+            sys.stderr.write("Error writing output: %s\n" % e)
             sys.exit(-1)
 
     for line in in_file:
-        parsed = parse_line(line,use_geoip)
+        parsed = parse_line(line, use_geoip)
         if parsed is None:
             pass
         else:
             if (use_CSV):
                 writer.writerow(parsed)
             elif (use_SQL):
-                my_obj = models.add_event( 
-                                           date    = parsed['Date'],
-                                           arch    = parsed['Arch'],
-                                           os      = parsed['OS'],
-                                           release = parsed['Release'],
-                                           variant = parsed['Variant'],
-                                           country = parsed['Country'],
-                                           address = parsed['IP'],
-                                           uuid    = parsed['UUID'],
-                                           client  = parsed['ClientApp']
-                                       )
+                models.add_event(
+                    date=parsed['Date'],
+                    arch=parsed['Arch'],
+                    os=parsed['OS'],
+                    release=parsed['Release'],
+                    variant=parsed['Variant'],
+                    country=parsed['Country'],
+                    address=parsed['IP'],
+                    uuid=parsed['UUID'],
+                    client=parsed['ClientApp']
+                )
 
     # Don't Leak data and close our streams.
     if (use_SQL):
@@ -183,60 +179,67 @@ def parselog(in_file, use_CSV, out_file, use_SQL, use_geoip):
     return
 
 
-##
-## The main procedure parses our command lines and sees what may have been given
-## It will take multiple files and output them to a defined output file
 def main():
+    #
+    # The main procedure parses our command lines and sees what may have
+    # been given It will take multiple files and output them to a defined
+    # output file
+
     # Define our parser tuple
+
     parser = argparse.ArgumentParser(
-        description = "A program to parse Fedora mirrorlist apache common log format files.",
-        prog = "mirror-analysis.py",
-        version = "1.1.0",
-        epilog = "CSV and SQL are mutually exclusive."
+        description="A program to parse Fedora mirrorlist apache " +
+        "common log format files.",
+        prog="mirror-analysis.py",
+        version="1.1.0",
+        epilog="CSV and SQL are mutually exclusive."
     )
     #
     # By default Output to CSV
     #
     parser.set_defaults(
-        CSV=False, 
-        SQL=False, 
+        CSV=False,
+        SQL=False,
         geoip=False
     )
 
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-C", "--CSV",
-                      action="store_true",
-                      help = "Use csv output file.",
-                      dest = "CSV")
+                       action="store_true",
+                       help="Use csv output file.",
+                       dest="CSV")
 
     group.add_argument("-S", "--SQL",
                        action="store_true",
-                       help = "Sets the name of the database file for the run.",
-                       dest = "SQL")
+                       help="Sets the name of the database file for the run.",
+                       dest="SQL")
 
     parser.add_argument("-o", "--output",
-                        help = "Sets the name of the output file for the run.",
-                        dest = "output",
-                        default = config.CSV_FILE,
-                        type =argparse.FileType('a')
+                        help="Sets the name of the output file for the run.",
+                        dest="output",
+                        default=config.CSV_FILE,
+                        type=argparse.FileType('a'))
 
-)
     parser.add_argument("-G", "--geoip",
                         action="store_true",
-                        help = "Says whether to turn on geoip lookups",
-                        dest = "geoip")
+                        help="Says whether to turn on geoip lookups",
+                        dest="geoip")
 
-    parser.add_argument('files', 
-                        nargs='+', 
+    parser.add_argument('files',
+                        nargs='+',
                         type=argparse.FileType('r'))
-
 
     # determine the options
     args = parser.parse_args()
 
     # loop through the remaining arguments to see if we have files to add.
     for our_file in args.files:
-        parselog(our_file,args.CSV,args.output,args.SQL,args.geoip)
+        parselog(our_file,
+                 args.CSV,
+                 args.output,
+                 args.SQL,
+                 args.geoip)
+
 
 if __name__ == '__main__':
     main()
