@@ -4,8 +4,8 @@
 import models
 import sys
 
-sys.path.append('../')
-import config
+sys.path.append('../')  # noqa: E402
+import config  # noqa: E402
 
 test_uuid = 'f3159e3b-7ca6-4243-83dd-376755ab4721'
 

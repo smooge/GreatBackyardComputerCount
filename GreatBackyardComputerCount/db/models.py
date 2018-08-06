@@ -116,10 +116,10 @@ def add_event(date, arch, os, release, variant,
     if type(date) is not datetime:
         try:
             date = datetime.strptime(date, "%Y-%m-%d  %H:%M:%S")
-        except:
+        except Exception:
             try:
                 date = datetime.strptime(date, "%Y-%m-%d")
-            except:
+            except Exception:
                 date = config.DEF_DATE
 
     # These are lookup tables so we do not want to add if not found
@@ -213,7 +213,8 @@ class LU_Architecture(Base):
     description = sa.Column(sa.String(1024), nullable=True)
 
     def __repr__(self):
-        return "<Architecture(name='%s', long_name='%s', description='%s')>" % (self.name, self.long_name, self.description)
+        ret_str = "<Architecture(name='%s', long_name='%s', description='%s')>"
+        return ret_str % (self.name, self.long_name, self.description)
 
 
 class LU_OS(Base):
@@ -238,7 +239,9 @@ class LU_OS(Base):
     description = sa.Column(sa.String(1024), nullable=True)
 
     def __repr__(self):
-        return "<Operating System(name='%s', long_name='%s',description='%s')>" % (self.name, self.long_name, self.description)
+        ret_str = "<Operating System(name='%s', " + \
+                  "long_name='%s',description='%s')>"
+        return ret_str % (self.name, self.long_name, self.description)
 
 
 class LU_Release(Base):
@@ -275,7 +278,7 @@ class LU_Release(Base):
         else:
             try:
                 rel = datetime.strptime(release_date, "%Y-%m-%d")
-            except:
+            except Exception:
                 rel = config.DEF_DATE
 
         if type(eol_date) is datetime:
@@ -283,7 +286,7 @@ class LU_Release(Base):
         else:
             try:
                 eol = datetime.strptime(eol_date, "%Y-%m-%d")
-            except:
+            except Exception:
                 eol = config.DEF_DATE
 
         self.name = name
@@ -293,7 +296,13 @@ class LU_Release(Base):
         self.eol_date = eol
 
     def __repr__(self):
-        return "<Release(name='%s', long='%s', description='%s', release='%s', eol='%s')>" % (self.name, self.long_name, self.description, self.release_date.isoformat(), self.eol_date.isoformat())
+        ret_str = "<Release(name='%s', long='%s', description='%s'," + \
+                  "release='%s', eol='%s')>"
+        return ret_str % (self.name,
+                          self.long_name,
+                          self.description,
+                          self.release_date.isoformat(),
+                          self.eol_date.isoformat())
 
 
 class LU_Variant(Base):
@@ -314,7 +323,8 @@ class LU_Variant(Base):
     description = sa.Column(sa.String(1024), nullable=True)
 
     def __repr__(self):
-        return "<Release(name='%s', description='%s')>" % (self.name, self.description)
+        ret_str = "<Release(name='%s', description='%s')>"
+        return ret_str % (self.name, self.description)
 
 
 class LU_Country(Base):
@@ -335,12 +345,14 @@ class LU_Country(Base):
     long_name = sa.Column(sa.String(80), unique=True, nullable=True)
 
     def __repr__(self):
-        return "<Country(name='%s', long_name='%s',)>" % (self.name, self.long_name)
+        ret_str = "<Country(name='%s', long_name='%s',)>"
+        return ret_str % (self.name, self.long_name)
 
 
 class LU_ClientApp(Base):
     """
-    A table to insert ClientApps's most entries will not have ones so we should allow one Null
+    A table to insert ClientApps's most entries will not have ones
+    so we should allow one Null
     +------------------------+
     |    LU_ClientApp Table  |
     +========+===============+
@@ -377,7 +389,8 @@ class LU_IPAddress(Base):
 
 class LU_UUID(Base):
     """
-    A table to insert UUID's most entries will not have ones so we should allow one Null
+    A table to insert UUID's most entries will not have ones so
+    we should allow one Null
     +------------------------+
     |    LU_UUID Table       |
     +========+===============+
@@ -468,7 +481,10 @@ class Events(Base):
     client = relationship('LU_ClientApp', backref='Events')
 
     def __repr__(self):
-        return "<Event(pk='%s', date='%s', arch='%s',os='%s', rel='%s', var='%s', country='%s',client='%s', ip='%s',uuid='%s')>" % (
+        ret_str = "<Event(pk='%s', date='%s', arch='%s',os='%s'," + \
+                  "rel='%s', var='%s', country='%s',client='%s'," + \
+                  "ip='%s',uuid='%s')>"
+        return ret_str % (
             self.pk_id,
             self.date,
             self.arch,

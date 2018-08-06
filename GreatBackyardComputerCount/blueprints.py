@@ -24,7 +24,7 @@ from datetime import datetime
 
 import geoip2.database   # can't know your places
 import maxminddb.const
-import logging           # and to log our errors
+# import logging           # and to log our errors
 
 from db import models
 
@@ -100,7 +100,7 @@ def census():
     try:
         response = reader_country.country(flask.request.remote_addr)
         my_country = response.country.iso_code
-    except:
+    except Exception:
         my_country = config.DEF_COUNTRY
 
     flask.current_app.logger.info(
@@ -149,7 +149,8 @@ def arches():
             'description': i.description,
             'count': models.Events.query.filter(
                 models.Events.fk_arch == models.LU_Architecture.query.filter(
-                    models.LU_Architecture.name == i.name).first().pk_id).count()})
+                    models.LU_Architecture.name
+                    == i.name).first().pk_id).count()})
 
     return flask.render_template('arches.html',
                                  arches=temp_table)
@@ -163,7 +164,10 @@ def apps():
         temp_table.append({
             'name': i.name,
             'count': models.Events.query.filter(
-                models.Events.fk_client == models.LU_ClientApp.query.filter(models.LU_ClientApp.name == i.name).first().pk_id).count()})
+                models.Events.fk_client
+                == models.LU_ClientApp.query.filter(
+                    models.LU_ClientApp.name
+                    == i.name).first().pk_id).count()})
     return flask.render_template('clientapps.html',
                                  clientapps=temp_table)
 
@@ -177,7 +181,10 @@ def countries():
             'name': i.name,
             'long_name': i.long_name,
             'count': models.Events.query.filter(
-                models.Events.fk_country == models.LU_Country.query.filter(models.LU_Country.name == i.name).first().pk_id).count()})
+                models.Events.fk_country
+                == models.LU_Country.query.filter(
+                    models.LU_Country.name
+                    == i.name).first().pk_id).count()})
     return flask.render_template('countries.html',
                                  countries=temp_table)
 
@@ -192,7 +199,10 @@ def os():
             'long_name': i.long_name,
             'description': i.description,
             'count': models.Events.query.filter(
-                models.Events.fk_os == models.LU_OS.query.filter(models.LU_OS.name == i.name).first().pk_id).count()})
+                models.Events.fk_os
+                == models.LU_OS.query.filter(
+                    models.LU_OS.name
+                    == i.name).first().pk_id).count()})
     return flask.render_template('os.html',
                                  oses=temp_table)
 
@@ -209,7 +219,10 @@ def releases():
             'release_date': i.release_date,
             'eol_date': i.eol_date,
             'count': models.Events.query.filter(
-                models.Events.fk_release == models.LU_Release.query.filter(models.LU_Release.name == i.name).first().pk_id).count()})
+                models.Events.fk_release
+                == models.LU_Release.query.filter(
+                    models.LU_Release.name
+                    == i.name).first().pk_id).count()})
     return flask.render_template('os_releases.html',
                                  releases=temp_table)
 
@@ -223,19 +236,27 @@ def variants():
             'name': i.name,
             'description': i.description,
             'count': models.Events.query.filter(
-                models.Events.fk_variant == models.LU_Variant.query.filter(models.LU_Variant.name == i.name).first().pk_id).count()})
+                models.Events.fk_variant
+                == models.LU_Variant.query.filter(
+                    models.LU_Variant.name
+                    == i.name).first().pk_id).count()})
     return flask.render_template('os_variants.html',
                                  variants=temp_table)
 
 
 @ips_page.route("/data/addresses", methods=('get', 'post'))
 def ips():
-    lookups = models.LU_IPAddress.query.order_by(models.LU_IPAddress.pk_id.desc()).limit(config.NUMQ)
+    lookups = models.LU_IPAddress.query.order_by(
+        models.LU_IPAddress.pk_id.desc()).limit(config.NUMQ)
     temp_table = [{}]
     for i in lookups:
         temp_table.append({
             'ip_address': i.ip_address,
-            'count': models.Events.query.filter(models.Events.fk_address == models.LU_IPAddress.query.filter(models.LU_IPAddress.ip_address == i.ip_address).first().pk_id).count()})
+            'count': models.Events.query.filter(
+                models.Events.fk_address
+                == models.LU_IPAddress.query.filter(
+                    models.LU_IPAddress.ip_address
+                    == i.ip_address).first().pk_id).count()})
     return flask.render_template('addresses.html',
                                  count=config.NUMQ,
                                  addresses=temp_table)
@@ -243,12 +264,17 @@ def ips():
 
 @uuids_page.route("/data/uuids", methods=('get', ' post'))
 def uuids():
-    lookups = models.LU_UUID.query.order_by(models.LU_UUID.pk_id.desc()).limit(config.NUMQ)
+    lookups = models.LU_UUID.query.order_by(
+        models.LU_UUID.pk_id.desc()).limit(config.NUMQ)
     temp_table = [{}]
     for i in lookups:
         temp_table.append({
             'uuid': i.uuid,
-            'count': models.Events.query.filter(models.Events.fk_uuid == models.LU_UUID.query.filter(models.LU_UUID.uuid == i.uuid).first().pk_id).count()})
+            'count': models.Events.query.filter(
+                models.Events.fk_uuid
+                == models.LU_UUID.query.filter(
+                    models.LU_UUID.uuid
+                    == i.uuid).first().pk_id).count()})
     return flask.render_template('uuids.html',
                                  count=config.NUMQ,
                                  uuids=temp_table)
@@ -256,7 +282,8 @@ def uuids():
 
 @events_page.route("/data/events", methods=('get', 'post'))
 def events():
-    lookups = models.Events.query.order_by(models.Events.date.desc()).limit(config.NUMQ)
+    lookups = models.Events.query.order_by(
+        models.Events.date.desc()).limit(config.NUMQ)
     return flask.render_template('events.html',
                                  count=config.NUMQ,
                                  events=lookups)

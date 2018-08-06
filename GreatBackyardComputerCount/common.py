@@ -51,7 +51,7 @@ def determine_apache_date(givendate):
     date_subpart = givendate.split()
     try:
         date = datetime.strptime(date_subpart[0], "%d/%b/%Y:%H:%M:%S")
-    except:
+    except Exception:
         date = config.DEF_DATE
     return date
 
@@ -138,11 +138,11 @@ def determine_uuid(asked_uuid):
         return uuid
     try:
         asked_uuid = asked_uuid.lower()
-    except:
+    except Exception:
         return uuid
     try:
         sanitize = str(UUID(asked_uuid, version=4))
-    except:
+    except Exception:
         return uuid
     if sanitize == asked_uuid:
         return sanitize
@@ -157,7 +157,7 @@ def determine_client(asked_client):
         return client
     try:
         asked_client = asked_client.lower()
-    except:
+    except Exception:
         return config.DEF_CLIENT
 
     for key, value in config.KNOWN_CLIENTS.iteritems():

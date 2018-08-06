@@ -47,7 +47,7 @@ pattern = re.compile("".join(config.REPO_LOGFMT))
 try:
     reader_country = geoip2.database.Reader(config.GEO_DB_COUNTRY_LOC,
                                             mode=maxminddb.const.MODE_MEMORY)
-except:
+except Exception as err:
     sys.exit(errno.EACCES)
 
 #
@@ -111,7 +111,7 @@ def parse_line(our_line, use_geoip):
                 try:
                     response = reader_country.country(my_ip)
                     my_country = response.country.iso_code
-                except:
+                except Exception:
                     my_country = config.DEF_COUNTRY
             else:
                 my_country = config.DEF_COUNTRY
