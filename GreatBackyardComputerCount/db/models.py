@@ -61,8 +61,6 @@ def get_one_or_create(model, **kwargs):
     http://skien.cc/blog/2014/01/15/sqlalchemy-and-race-conditions-implementing/
 
     """
-    created = False
-
     try:
         instance = model.query.filter_by(**kwargs).one()
     except NoResultFound:
@@ -71,16 +69,15 @@ def get_one_or_create(model, **kwargs):
             instance = model(**kwargs)
             session.add(instance)
             session.commit()
-            created = True
         except IntegrityError:
             session.rollback()
             try:
                 instance = model.query.filter_by(**kwargs).one()
-            except NoResultFound:
+            except NoResultFound: 
                 instance = None
-        except MultipleResultsFound:
-            instance = model.query.filter_by(**kwargs).first()
-            return (instance, created)
+    except MultipleResultsFound:
+        instance = model.query.filter_by(**kwargs).first()
+    return instance
 
 
 def add_event(date, arch, os, release, variant,
@@ -123,53 +120,53 @@ def add_event(date, arch, os, release, variant,
                 date = config.DEF_DATE
 
     # These are lookup tables so we do not want to add if not found
-    arch = get_only_one(LU_Architecture, name=arch)
-    os = get_only_one(LU_OS, name=os)
-    release = get_only_one(LU_Release, name=release)
-    variant = get_only_one(LU_Variant, name=variant)
-    country = get_only_one(LU_Country, name=country)
-    client = get_only_one(LU_ClientApp, name=client)
+    my_arch = get_only_one(LU_Architecture, name=arch)
+    my_os = get_only_one(LU_OS, name=os)
+    my_release = get_only_one(LU_Release, name=release)
+    my_variant = get_only_one(LU_Variant, name=variant)
+    my_country = get_only_one(LU_Country, name=country)
+    my_client = get_only_one(LU_ClientApp, name=client)
     # These need to insert an ip or uuid if not found
-    address = get_one_or_create(LU_IPAddress,
-                                ip_address=address)[0]
-    uuid = get_one_or_create(LU_UUID, uuid=uuid)[0]
+    my_address = get_one_or_create(
+        LU_IPAddress, ip_address=address)
+    my_uuid = get_one_or_create(LU_UUID, uuid=uuid)
 
     try:
         instance = Events.query.filter_by(
             date=date,
-            arch=arch,
-            os=os,
-            release=release,
-            variant=variant,
-            country=country,
-            address=address,
-            uuid=uuid,
-            client=client,
+            arch=my_arch,
+            os=my_os,
+            release=my_release,
+            variant=my_variant,
+            country=my_country,
+            address=my_address,
+            uuid=my_uuid,
+            client=my_client,
         ).one()
     except NoResultFound:
         instance = Events(date=date,
-                          arch=arch,
-                          os=os,
-                          release=release,
-                          variant=variant,
-                          country=country,
-                          address=address,
-                          uuid=uuid,
-                          client=client)
+                          arch=my_arch,
+                          os=my_os,
+                          release=my_release,
+                          variant=my_variant,
+                          country=my_country,
+                          address=my_address,
+                          uuid=my_uuid,
+                          client=my_client)
         session.add(instance)
         session.commit()
 
     except MultipleResultsFound:
         instance = Events.query.filter_by(
             date=date,
-            arch=arch,
-            os=os,
-            release=release,
-            variant=variant,
-            country=country,
-            address=address,
-            uuid=uuid,
-            client=client,
+            arch=my_arch,
+            os=my_os,
+            release=my_release,
+            variant=my_variant,
+            country=my_country,
+            address=my_address,
+            uuid=my_uuid,
+            client=my_client,
         ).first()
 
     return instance
@@ -365,8 +362,8 @@ class LU_ClientApp(Base):
     pk_id = sa.Column(sa.Integer, primary_key=True, nullable=False)
     name = sa.Column(sa.String(36), unique=True, nullable=True)
 
-    def __repr(self):
-        return "<UUID('%s')>" % (self.uuid)
+    def __repr__(self):
+        return "<ClientApp('%s')>" % (self.name)
 
 
 class LU_IPAddress(Base):
